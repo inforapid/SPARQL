@@ -4,6 +4,8 @@ SPARQL queries for the WikiData endpoint for use with the InfoRapid KnowledgeBas
 
 ## SPARQL and the InfoRapid KnowledgeBase Builder
 
+![3D rotating MindMap of SPARQL query result](images/Example.gif?raw=true "Example")
+
 ### The following prefixes must be used for SPARQL variables in the SELECT statement:
 ```
 i_ : item
