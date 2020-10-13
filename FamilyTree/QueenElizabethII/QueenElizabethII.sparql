@@ -1,0 +1,21 @@
+# The following prefixes must be used for SPARQL variables in the SELECT statement:
+SELECT ?i_item ?i_itemLabel ?i_itemDescription ?ii_pic ?iu_enwiki ?rn_property1Label (?rn_property1Label as ?rc_property1Label) ?i_link1 ?rn_property2Label (?rn_property2Label as ?rc_property2Label) ?i_link2 ?rn_t_property3Label (?rn_t_property3Label as ?rc_property3Label) ?ic_DateOfBirth ?rn_t_property4Label (?rn_t_property4Label as ?rc_property4Label) ?ic_PlaceOfBirth ?ic_PlaceOfBirthLabel ?ic_PlaceOfBirthDescription ?rn_t_property5Label (?rn_t_property5Label as ?rc_property5Label) ?ic_DateOfDeath ?rn_t_property6Label (?rn_t_property6Label as ?rc_property6Label) ?ic_PlaceOfDeath ?ic_PlaceOfDeathLabel ?ic_PlaceOfDeathDescription ?rn_property7Label (?rn_property7Label as ?rc_property7Label) ?i_Spouse ?i_SpouseLabel ?i_SpouseDescription WHERE {
+wd:Q9682 wdt:P40* ?i_item.
+OPTIONAL { ?i_item wdt:P18 ?ii_pic. }
+OPTIONAL { ?iu_enwiki schema:about ?i_item; schema:isPartOf <https://en.wikipedia.org/> }
+OPTIONAL { ?i_item wdt:P22 ?i_link1. }
+OPTIONAL { ?rn_property1 wikibase:directClaim wdt:P22. }
+OPTIONAL { ?i_item wdt:P25 ?i_link2. }
+OPTIONAL { ?rn_property2 wikibase:directClaim wdt:P25. }
+OPTIONAL { ?i_item wdt:P569 ?ic_DateOfBirth. }
+OPTIONAL { ?rn_t_property3 wikibase:directClaim wdt:P569. }
+OPTIONAL { ?i_item wdt:P19 ?ic_PlaceOfBirth. }
+OPTIONAL { ?rn_t_property4 wikibase:directClaim wdt:P19. }
+OPTIONAL { ?i_item wdt:P570 ?ic_DateOfDeath. }
+OPTIONAL { ?rn_t_property5 wikibase:directClaim wdt:P570. }
+OPTIONAL { ?i_item wdt:P20 ?ic_PlaceOfDeath. }
+OPTIONAL { ?rn_t_property6 wikibase:directClaim wdt:P20. }
+OPTIONAL { ?i_item wdt:P26 ?i_Spouse. }
+OPTIONAL { ?rn_property7 wikibase:directClaim wdt:P26. }
+SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
