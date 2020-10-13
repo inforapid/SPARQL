@@ -8,7 +8,7 @@ WHERE
 }
 
 #query
-SELECT ?i_priceWinner ?i_priceWinnerLabel ?ii_PriceWinnerPic ?i_occupation ?ic_occupation ?i_occupationLabel ?i_occupationDescription ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath (year(?NobelPriceYear) as ?i_NobelPriceYear) ?ic_NobelPriceYear
+SELECT ?i_priceWinner ?i_priceWinnerLabel ?ii_PriceWinnerPic ?i_occupation ?ic_occupation ?i_occupationLabel ?i_occupationDescription ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_NobelPriceYear (year(?NobelPriceYear) as ?i_NobelPriceYear) ?ic_NobelPriceYear
 WHERE 
 {
   ?i_priceWinner wdt:P166 wd:Q38104.
@@ -22,5 +22,6 @@ WHERE
   OPTIONAL { ?rn_t_DateOfBirth wikibase:directClaim wdt:P569. }
   OPTIONAL { ?i_priceWinner wdt:P570 ?ic_DateOfDeath. }
   OPTIONAL { ?rn_t_DateOfDeath wikibase:directClaim wdt:P570. }
+  BIND("awarding" AS ?rn_NobelPriceYear).
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
