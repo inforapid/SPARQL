@@ -1,12 +1,12 @@
 # SPARQL
 
-SPARQL queries for the WikiData endpoint for use with the InfoRapid KnowledgeBase Builder
+In this project I want to collect useful SPARQL queries for the WikiData endpoint for use with the InfoRapid KnowledgeBase Builder. Please participate and publish your own favorite SPARQL queries.
 
 ## SPARQL and the InfoRapid KnowledgeBase Builder
 
 ![3D rotating MindMap of SPARQL query result](images/Example.gif?raw=true "Example")
 
-### The following prefixes must be used for SPARQL variables in the SELECT statement:
+### The following prefixes must be used for SPARQL variables in the KnowledgeBase Builder SELECT statement:
 ```
 i_ : item
 ic_ : item category, the column values are ignored, only the column header is relevant
