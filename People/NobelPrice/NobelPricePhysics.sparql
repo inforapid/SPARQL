@@ -1,4 +1,13 @@
 #query
+SELECT ?i_Occupation ?ic_Occupation ?i_OccupationLabel ?i_GeneralizedOccupation ?ic__Occupation ?i_GeneralizedOccupationLabel
+WHERE 
+{
+  ?i_Occupation (wdt:P279*) wd:Q169470.
+  ?i_Occupation wdt:P279 ?i_GeneralizedOccupation.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+#query
 SELECT ?i_priceWinner ?i_priceWinnerLabel ?ii_PriceWinnerPic ?i_occupation ?ic_occupation ?i_occupationLabel ?i_occupationDescription ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath (year(?NobelPriceYear) as ?i_NobelPriceYear) ?ic_NobelPriceYear
 WHERE 
 {
