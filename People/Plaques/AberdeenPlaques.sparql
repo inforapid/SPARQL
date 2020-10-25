@@ -1,0 +1,19 @@
+#Query to select all of the human subjects of Commemorative plaques in Aberdeen, their occupations, dates of birth / death. 
+# Change Q62274582 to another administrative area (e.g. Q55934339 for Glasgow) to get the results for there. 
+
+SELECT ?i_subject ?iu_enwiki ?i_subjectLabel ?ii_pic ?rn_t_dobLabel ?i_DOB ?rn_t_dodLabel ?i_DOD ?i_place ?i_placeLabel ?i_plaque ?i_plaqueLabel 
+?ii_plaqueImage ?i_occupationLabel WHERE  
+{
+ ?i_plaque wdt:P31 wd:Q721747; wdt:P131 wd:Q62274582 .
+     ?i_plaque wdt:P547 ?i_subject .
+     ?i_subject wdt:P31 wd:Q5 .   
+  
+OPTIONAL { ?iu_enwiki schema:about ?i_subject; schema:isPartOf <https://en.wikipedia.org/> }
+OPTIONAL {?i_subject wdt:P18  ?ii_pic. }
+OPTIONAL {?i_plaque wdt:P18 ?ii_plaqueImage .}
+OPTIONAL {?rn_t_dob wikibase:directClaim wdt:P569. }
+OPTIONAL {?i_subject wdt:P569 ?i_DOB .}
+OPTIONAL {?rn_t_dod wikibase:directClaim wdt:P570. }
+OPTIONAL {?i_subject wdt:P570 ?i_DOD .}
+SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
