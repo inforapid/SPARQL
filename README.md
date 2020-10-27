@@ -14,6 +14,7 @@ in_ or i_XXXLabel or ic_XXXLabel: item name
 id_ or i_XXXDescription or ic_XXXDescription: item description
 iu_ : item url
 ii_ : item image
+idi_ : item description image
 rn_ : relation name
 rn_t_ : relation name for a table relation
 rc_ : relation category
