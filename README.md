@@ -46,6 +46,11 @@ OPTIONAL { ?i_place p:P625 ?statement.
 }
 ```
 
+#### Query the Wikipedia url for i_item
+```
+OPTIONAL { ?iu_wikipedia_url schema:about ?i_item; schema:isPartOf <https://en.wikipedia.org/> }
+```
+
 #### Find all places within a given radius around a central location
 ```
 ?centerPlace wdt:P625 ?centerLoc.
