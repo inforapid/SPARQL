@@ -34,3 +34,13 @@ A line starting with the comment #query can be used to separte many queries
 ```
 BIND (CONCAT (STR (?url), "§if") AS ?iu_url).
 ```
+
+### Create an url which links ?i_place to its position in Google Maps
+```
+OPTIONAL { ?i_place p:P625 ?statement.
+  ?statement psv:P625 ?coordinate_node.
+  ?coordinate_node wikibase:geoLatitude ?lat.
+  ?coordinate_node wikibase:geoLongitude ?long.
+  BIND (CONCAT ("http://www.google.com/maps/place/", STR(?lat), ",", STR(?long), "§if") AS ?iu_url).
+}
+```
