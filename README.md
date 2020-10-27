@@ -56,3 +56,9 @@ SERVICE wikibase:around {
   bd:serviceParam wikibase:distance ?dist. # current distance in kilometers
 }
 ```
+
+#### Calculate the distance between two locations
+```
+BIND (geof:distance (?location1, ?location2) AS ?dist).
+```
+
