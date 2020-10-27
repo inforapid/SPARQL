@@ -62,3 +62,8 @@ SERVICE wikibase:around {
 BIND (geof:distance (?location1, ?location2) AS ?dist).
 ```
 
+#### Round the distance with a precision of 10 meters and add the unit m
+```
+BIND (CONCAT (xsd:string (xsd:integer (CEIL (100 * ?dist) * 10)), " m") AS ?rounded_dist_in_m).
+```
+
