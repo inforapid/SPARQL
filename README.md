@@ -76,3 +76,8 @@ BIND (geof:distance (?location1, ?location2) AS ?dist).
 BIND (CONCAT (xsd:string (xsd:integer (CEIL (100 * ?dist) * 10)), " m") AS ?rounded_dist_in_m).
 ```
 
+#### item1 is connected to iItem2 through property, get the propertyName (SELECT propertyNameLabel)
+```
+?item1 ?property ?item2.
+OPTIONAL { ?propertyName wikibase:directClaim ?property. }
+```
