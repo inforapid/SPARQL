@@ -45,3 +45,14 @@ OPTIONAL { ?i_place p:P625 ?statement.
   BIND (CONCAT ("http://www.google.com/maps/place/", STR(?lat), ",", STR(?long), "§if") AS ?iu_url).
 }
 ```
+
+#### Find all places within a given radius around a central location
+```
+?centerPlace wdt:P625 ?centerLoc.
+SERVICE wikibase:around {
+  ?i_place wdt:P625 ?location. # the first statement must include the place and the location
+  bd:serviceParam wikibase:center ?centerLoc.
+  bd:serviceParam wikibase:radius "10". # maximum distance in kilometers
+  bd:serviceParam wikibase:distance ?dist. # current distance in kilometers
+}
+```
