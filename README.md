@@ -28,3 +28,9 @@ One result row can connect item1 with any number of other items
 
 A line starting with the comment #query can be used to separte many queries
 ```
+## SPARQL code snippets for use with the InfoRapid KnowledgeBase Builder
+
+#### Convert an url so that it opens inplace in the KnowledgeBase Builder:
+```
+BIND (CONCAT (STR (?url), "§if") AS ?iu_url).
+```
