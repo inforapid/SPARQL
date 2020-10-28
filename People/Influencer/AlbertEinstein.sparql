@@ -1,0 +1,21 @@
+SELECT ?i_influencedByPerson ?i_influencedByPersonLabel ?i_influencedByPersonDescription ?ii_influencedByPerson ?iu_influencedByPerson ?rn_influences ?i_person ?i_personLabel ?i_personDescription ?ii_person ?iu_person ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_NotableWorkLabel ?ic_NotableWork ?ic_NotableWorkLabel ?ic_NotableWorkDescription
+WHERE 
+{
+  ?i_person wdt:P737* wd:Q159481.
+  ?i_person wdt:P31 wd:Q5.
+  ?i_person wdt:P737 ?i_influencedByPerson.
+  ?i_influencedByPerson wdt:P31 wd:Q5.
+  OPTIONAL { ?i_person wdt:P18 ?ii_person. }
+  BIND (CONCAT (STR (?i_person), "§if") AS ?iu_person).
+  OPTIONAL { ?i_influencedByPerson wdt:P18 ?ii_influencedByPerson. }
+  BIND (CONCAT (STR (?i_influencedByPerson), "§if") AS ?iu_influencedByPerson).
+  BIND("influences" AS ?rn_influences).
+  OPTIONAL { ?i_influencedByPerson wdt:P569 ?ic_DateOfBirth. }
+  OPTIONAL { ?rn_t_DateOfBirth wikibase:directClaim wdt:P569. }
+  OPTIONAL { ?i_influencedByPerson wdt:P570 ?ic_DateOfDeath. }
+  OPTIONAL { ?rn_t_DateOfDeath wikibase:directClaim wdt:P570. }
+  OPTIONAL { ?i_influencedByPerson wdt:P800 ?ic_NotableWork. }
+  OPTIONAL { ?rn_NotableWork wikibase:directClaim wdt:P800. }
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
