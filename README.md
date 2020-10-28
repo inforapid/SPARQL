@@ -81,3 +81,21 @@ BIND (CONCAT (xsd:string (xsd:integer (CEIL (100 * ?dist) * 10)), " m") AS ?roun
 ?item1 ?property ?item2.
 OPTIONAL { ?propertyName wikibase:directClaim ?property. }
 ```
+
+#### Get the image to an item
+```
+OPTIONAL { ?i_item wdt:P18 ?ii_itemImage. }
+```
+
+#### Get Date of Birth / Date of Death / Place of Birth / Place of Death for a person
+```
+OPTIONAL { ?i_person wdt:P569 ?ic_DateOfBirth. }
+OPTIONAL { ?rn_t_DateOfBirth wikibase:directClaim wdt:P569. }
+OPTIONAL { ?i_person wdt:P570 ?ic_DateOfDeath. }
+OPTIONAL { ?rn_t_DateOfDeath wikibase:directClaim wdt:P570. }
+OPTIONAL { ?i_person wdt:P19 ?ic_PlaceOfBirth. }
+OPTIONAL { ?rn_t_PlaceOfBirth wikibase:directClaim wdt:P19. }
+OPTIONAL { ?i_person wdt:P20 ?ic_PlaceOfDeath. }
+OPTIONAL { ?rn_t_PlaceOfDeath wikibase:directClaim wdt:P20. }
+```
+
