@@ -1,4 +1,4 @@
-SELECT ?i_influencedByPerson ?i_influencedByPersonLabel ?i_influencedByPersonDescription ?ii_influencedByPerson ?iu_influencedByPerson ?rn_influences ?i_person ?i_personLabel ?i_personDescription ?ii_person ?iu_person ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_NotableWorkLabel ?i_NotableWork ?i_NotableWorkLabel ?i_NotableWorkDescription ?iu_NotableWork ?ii_NotableWork
+SELECT ?i_influencedByPerson ?i_influencedByPersonLabel ?i_influencedByPersonDescription ?ii_influencedByPerson ?iu_influencedByPerson ?rn_influences ?i_person ?i_personLabel ?i_personDescription ?ii_person ?iu_person ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_NotableWorkLabel ?i_NotableWork ?i_NotableWorkLabel ?i_NotableWorkDescription ?ic_NotableWork ?iu_NotableWork ?ii_NotableWork
 WHERE 
 {
   ?i_person wdt:P737* wd:Q159481.
