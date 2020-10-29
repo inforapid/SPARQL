@@ -32,5 +32,5 @@ SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer 
              OPTIONAL { ?i_notableWork wdt:P18 ?ii_notableWork. }
            }
   
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,de,fr". }
  }
