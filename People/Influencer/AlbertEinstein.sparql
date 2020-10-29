@@ -1,26 +1,36 @@
-SELECT ?i_influencedByPerson ?i_influencedByPersonLabel ?i_influencedByPersonDescription ?ii_influencedByPerson ?iu_influencedByPerson ?rn_influences ?i_person ?i_personLabel ?i_personDescription ?ii_person ?iu_person ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_NotableWorkLabel ?i_NotableWork ?i_NotableWorkLabel ?i_NotableWorkDescription ?ic_NotableWork ?iu_NotableWork ?ii_NotableWork
-WHERE 
-{
-  ?i_person wdt:P737* wd:Q159481.
-  ?i_person wdt:P31 wd:Q5.
-  ?i_person wdt:P737 ?i_influencedByPerson.
-  ?i_influencedByPerson wdt:P31 wd:Q5.
-  OPTIONAL { ?i_person wdt:P18 ?ii_person. }
-  BIND (CONCAT (STR (?i_person), "§if") AS ?iu_person).
-  OPTIONAL { ?i_influencedByPerson wdt:P18 ?ii_influencedByPerson. }
-  BIND (CONCAT (STR (?i_influencedByPerson), "§if") AS ?iu_influencedByPerson).
+SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer ?ii_influencer ?rn_influences ?i_influenced ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_notableWorkLabel ?i_notableWork ?i_notableWorkLabel ?i_notableWorkDescription ?iu_notableWork ?ii_notableWork WHERE {
+
+  {
+    SELECT ?i_influencer WHERE {
+      { ?i_influencer wdt:P737 wd:Q937. }
+      UNION
+      { wd:Q937 wdt:P737 ?i_influencer. }
+      UNION
+      { BIND (wd:Q937 AS ?i_influencer) }
+    }
+  }
+
+  OPTIONAL { ?i_influenced wdt:P737 ?i_influencer. }
+
+  BIND (CONCAT (STR (?i_influencer), "§if") AS ?iu_influencer).
+
+  OPTIONAL { ?i_influencer wdt:P18 ?ii_influencer. }
+
   BIND("influences" AS ?rn_influences).
-  OPTIONAL { ?i_influencedByPerson wdt:P569 ?ic_DateOfBirth.
+
+  OPTIONAL { ?i_influencer wdt:P569 ?ic_DateOfBirth.
              ?rn_t_DateOfBirth wikibase:directClaim wdt:P569.
            }
-  OPTIONAL { ?i_influencedByPerson wdt:P570 ?ic_DateOfDeath.
+
+  OPTIONAL { ?i_influencer wdt:P570 ?ic_DateOfDeath.
              ?rn_t_DateOfDeath wikibase:directClaim wdt:P570.
            }
-  OPTIONAL { ?i_influencedByPerson wdt:P800 ?i_NotableWork.
-             BIND (CONCAT (STR (?i_NotableWork), "§if") AS ?iu_NotableWork).
-             ?rn_NotableWork wikibase:directClaim wdt:P800.
-             OPTIONAL { ?i_NotableWork wdt:P18 ?ii_NotableWork. }
-           }
 
+  OPTIONAL { ?i_influencer wdt:P800 ?i_notableWork.
+             BIND (CONCAT (STR (?i_notableWork), "§if") AS ?iu_notableWork).
+             ?rn_notableWork wikibase:directClaim wdt:P800.
+             OPTIONAL { ?i_notableWork wdt:P18 ?ii_notableWork. }
+           }
+  
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
+ }
