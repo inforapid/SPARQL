@@ -2,7 +2,7 @@
 
 Show the [SQARQL query](./AlbertEinstein.sparql)
 
-[LIVE DEMO: People who inspired Albert Einstein and who were inspired by Albert Einstein](https://inforapid.org/webapp/webapp.php?shareddb=orfOOSsmR6td01jqvSms2HZUgCBh4sDeFp6KfUceqCfHloPBEyIMmr68PptTUelSsHvSoaHYEwQ3evbkzwhD7UxoXfNoJAdz)
+[LIVE DEMO: People who inspired Albert Einstein and who were inspired by Albert Einstein](https://inforapid.org/webapp/webapp.php?shareddb=CFyABWIsECme9X7uSriUcf5e6vLsHecuenfEjLTfZLyg8pUAhEnmyfytX4uJOStgZtRf08L3Exk7vXd6dglY6leXMfVwjxIi)
 
 Download the [KnowledgeBase Builder database](./AlbertEinstein.kdb)
 
