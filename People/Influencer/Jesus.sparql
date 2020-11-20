@@ -1,4 +1,4 @@
-SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer ?ii_influencer ?rn_influences ?i_influenced ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_presentInWorkLabel ?i_presentInWork ?i_presentInWorkLabel ?i_presentInWorkDescription ?iu_presentInWork ?ii_presentInWork ?rn_significantEventLabel ?i_significantEvent ?i_significantEventLabel ?i_significantEventDescription ?iu_significantEvent ?ii_significantEvent WHERE {
+SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer ?ii_influencer ?rn_influences ?i_influenced ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_t_CauseOfDeathLabel ?ic_CauseOfDeathLabel ?rn_presentInWorkLabel ?i_presentInWork ?i_presentInWorkLabel ?i_presentInWorkDescription ?iu_presentInWork ?ii_presentInWork ?rn_significantEventLabel ?i_significantEvent ?i_significantEventLabel ?i_significantEventDescription ?iu_significantEvent ?ii_significantEvent WHERE {
 
   {
     SELECT ?i_influencer WHERE {
@@ -37,6 +37,10 @@ SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer 
                       ?i_influencer wdt:P570 ?DateOfDeath.
                       FILTER (?DateOfDeath < ?ic_DateOfDeath).
                     }
+  OPTIONAL {
+             ?i_influencer wdt:P509 ?ic_CauseOfDeath.
+             ?rn_t_CauseOfDeath wikibase:directClaim wdt:P509.
+           }
 
   OPTIONAL {
              ?i_influencer wdt:P1441 ?i_presentInWork.
