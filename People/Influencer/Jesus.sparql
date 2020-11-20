@@ -1,0 +1,36 @@
+SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer ?ii_influencer ?rn_influences ?i_influenced ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_presentInWorkLabel ?i_presentInWork ?i_presentInWorkLabel ?i_presentInWorkDescription ?iu_presentInWork ?ii_presentInWork WHERE {
+
+  {
+    SELECT ?i_influencer WHERE {
+      { ?i_influencer (wdt:P737|wdt:P802) wd:Q302. }
+      UNION
+      { wd:Q302 (wdt:P737|wdt:P802) ?i_influencer. }
+      UNION
+      { BIND (wd:Q302 AS ?i_influencer) }
+    }
+  }
+
+  OPTIONAL { ?i_influenced (wdt:P737|wdt:P802) ?i_influencer. }
+
+  BIND (CONCAT (STR (?i_influencer), "§if") AS ?iu_influencer).
+
+  OPTIONAL { ?i_influencer wdt:P18 ?ii_influencer. }
+
+  BIND("student" AS ?rn_influences).
+
+  OPTIONAL { ?i_influencer wdt:P569 ?ic_DateOfBirth.
+             ?rn_t_DateOfBirth wikibase:directClaim wdt:P569.
+           }
+
+  OPTIONAL { ?i_influencer wdt:P570 ?ic_DateOfDeath.
+             ?rn_t_DateOfDeath wikibase:directClaim wdt:P570.
+           }
+
+  OPTIONAL { ?i_influencer wdt:P1441 ?i_presentInWork.
+             BIND (CONCAT (STR (?i_presentInWork), "§if") AS ?iu_presentInWork).
+             ?rn_presentInWork wikibase:directClaim wdt:P1441.
+             OPTIONAL { ?i_presentInWork wdt:P18 ?ii_presentInWork. }
+           }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,de,fr". }
+ }
