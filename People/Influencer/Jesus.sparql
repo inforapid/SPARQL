@@ -1,4 +1,4 @@
-SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer ?ii_influencer ?rn_influences ?i_influenced ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_presentInWorkLabel ?i_presentInWork ?i_presentInWorkLabel ?i_presentInWorkDescription ?iu_presentInWork ?ii_presentInWork WHERE {
+SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer ?ii_influencer ?rn_influences ?i_influenced ?rn_t_DateOfBirthLabel ?ic_DateOfBirth ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?rn_presentInWorkLabel ?i_presentInWork ?i_presentInWorkLabel ?i_presentInWorkDescription ?iu_presentInWork ?ii_presentInWork ?rn_significantEventLabel ?i_significantEvent ?i_significantEventLabel ?i_significantEventDescription ?iu_significantEvent ?ii_significantEvent WHERE {
 
   {
     SELECT ?i_influencer WHERE {
@@ -43,6 +43,13 @@ SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer 
              BIND (CONCAT (STR (?i_presentInWork), "§if") AS ?iu_presentInWork).
              ?rn_presentInWork wikibase:directClaim wdt:P1441.
              OPTIONAL { ?i_presentInWork wdt:P18 ?ii_presentInWork. }
+           }
+
+  OPTIONAL {
+             ?i_influencer wdt:P793 ?i_significantEvent.
+             BIND (CONCAT (STR (?i_significantEvent), "§if") AS ?iu_significantEvent).
+             ?rn_significantEvent wikibase:directClaim wdt:P793.
+             OPTIONAL { ?i_significantEvent wdt:P18 ?ii_significantEvent. }
            }
   
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,de,fr". }
