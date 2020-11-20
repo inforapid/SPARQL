@@ -18,19 +18,32 @@ SELECT ?i_influencer ?i_influencerLabel ?i_influencerDescription ?iu_influencer 
 
   BIND("student" AS ?rn_influences).
 
-  OPTIONAL { ?i_influencer wdt:P569 ?ic_DateOfBirth.
-             ?rn_t_DateOfBirth wikibase:directClaim wdt:P569.
+  OPTIONAL {
+              ?i_influencer wdt:P569 ?ic_DateOfBirth.
+              ?rn_t_DateOfBirth wikibase:directClaim wdt:P569.
            }
 
-  OPTIONAL { ?i_influencer wdt:P570 ?ic_DateOfDeath.
+  FILTER NOT EXISTS {
+                      ?i_influencer wdt:P569 ?DateOfBirth.
+                      FILTER (?DateOfBirth < ?ic_DateOfBirth).
+                    }
+
+  OPTIONAL {
+             ?i_influencer wdt:P570 ?ic_DateOfDeath.
              ?rn_t_DateOfDeath wikibase:directClaim wdt:P570.
            }
 
-  OPTIONAL { ?i_influencer wdt:P1441 ?i_presentInWork.
+  FILTER NOT EXISTS {
+                      ?i_influencer wdt:P570 ?DateOfDeath.
+                      FILTER (?DateOfDeath < ?ic_DateOfDeath).
+                    }
+
+  OPTIONAL {
+             ?i_influencer wdt:P1441 ?i_presentInWork.
              BIND (CONCAT (STR (?i_presentInWork), "§if") AS ?iu_presentInWork).
              ?rn_presentInWork wikibase:directClaim wdt:P1441.
              OPTIONAL { ?i_presentInWork wdt:P18 ?ii_presentInWork. }
            }
   
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,de,fr". }
- }
+}
