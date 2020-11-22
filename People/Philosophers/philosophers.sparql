@@ -1,0 +1,49 @@
+SELECT DISTINCT ?i_philosopher ?i_philosopherLabel ?i_philosopherDescription ?iu_philosopher ?ii_philosopher ?rn_t_DateOfBirthLabel ?ic_birthDate ?rn_t_DateOfDeathLabel ?ic_DateOfDeath ?ic_milyear ?ic_centyear ?ic_decyear ?rn_country ?i_country ?i_countryLabel ?i_countryDecription
+WHERE 
+{
+  {
+    SELECT ?ic_decyear ?ic_centyear
+    WHERE 
+    {
+      ?philosopher wdt:P106 wd:Q4964182.
+      ?philosopher wdt:P569 ?birthDate.
+      FILTER ((YEAR(?birthDate) > 100) && (YEAR(?birthDate) < 500)).
+      BIND (xsd:integer(FLOOR(YEAR(?birthDate) / 10) * 10) AS ?ic_decyear).
+      BIND (xsd:integer(FLOOR(YEAR(?birthDate) / 100) * 100) AS ?ic_centyear).
+    }
+  }
+  UNION
+  {
+    SELECT ?ic_centyear ?ic_milyear
+    WHERE 
+    {
+      ?philosopher wdt:P106 wd:Q4964182.
+      ?philosopher wdt:P569 ?birthDate.
+      FILTER ((YEAR(?birthDate) > 100) && (YEAR(?birthDate) < 500)).
+      BIND (xsd:integer(FLOOR(YEAR(?birthDate) / 100) * 100) AS ?ic_centyear).
+      BIND (xsd:integer(FLOOR(YEAR(?birthDate) / 1000) * 1000) AS ?ic_milyear).
+    }
+  }
+  UNION
+  {
+    SELECT ?i_philosopher ?iu_philosopher ?ii_philosopher ?ic_decyear ?rn_t_DateOfBirth ?ic_birthDate ?rn_t_DateOfDeath ?ic_DateOfDeath ?rn_country ?i_country
+    WHERE 
+    {
+      ?i_philosopher wdt:P106 wd:Q4964182.
+      ?i_philosopher wdt:P569 ?ic_birthDate.
+      FILTER ((YEAR(?ic_birthDate) > 100) && (YEAR(?ic_birthDate) < 500)).
+      BIND (xsd:integer(FLOOR(YEAR(?ic_birthDate) / 10) * 10) AS ?ic_decyear).
+      ?rn_t_DateOfBirth wikibase:directClaim wdt:P569.
+      OPTIONAL {
+        ?i_philosopher wdt:P570 ?ic_DateOfDeath.
+        ?rn_t_DateOfDeath wikibase:directClaim wdt:P570.
+      }
+      BIND (CONCAT (STR (?i_philosopher), "§if") AS ?iu_philosopher).
+      OPTIONAL { ?i_philosopher wdt:P18 ?ii_philosopher. }
+      BIND ("country" AS ?rn_country).
+      OPTIONAL { ?i_philosopher wdt:P27 ?i_country. }
+    }
+  }
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
