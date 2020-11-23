@@ -99,3 +99,7 @@ OPTIONAL { ?i_person wdt:P20 ?ic_PlaceOfDeath. }
 OPTIONAL { ?rn_t_PlaceOfDeath wikibase:directClaim wdt:P20. }
 ```
 
+#### Define a constant
+```
+VALUES (?item) {(wd:Q138809)}
+```
