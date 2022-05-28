@@ -1,4 +1,4 @@
-SELECT ?i_from ?i_fromLabel ?i_fromDescription ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription WHERE {
+SELECT ?i_from ?i_fromLabel ?i_fromDescription (?i_from as ?iu_from) ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription (?i_to as ?iu_to) WHERE {
   {
     SELECT DISTINCT ?i_from ?i_fromLabel ?i_fromDescription ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription WHERE {
       VALUES ?root {
