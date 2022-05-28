@@ -1,6 +1,6 @@
-SELECT ?i_from ?i_fromLabel ?rc_propertyLabel ?i_to ?i_toLabel WHERE {
+SELECT ?i_from ?i_fromLabel ?i_fromDescription ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription WHERE {
   {
-    SELECT DISTINCT ?i_from ?i_fromLabel ?rc_propertyLabel ?i_to ?i_toLabel WHERE {
+    SELECT DISTINCT ?i_from ?i_fromLabel ?i_fromDescription ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription WHERE {
       VALUES ?root {
         wd:Q460387
       }
