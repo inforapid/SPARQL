@@ -13,11 +13,32 @@ SELECT ?i_from ?i_fromLabel ?rc_propertyLabel ?i_to ?i_toLabel WHERE {
       {
         BIND(?root AS ?i_from)
         ?root ?property1 ?i_to.
-        FILTER(STRSTARTS(STR(?property1), STR(<http://www.wikidata.org/prop/direct/>)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
       }
       UNION
       {
         ?i_to ?property2 ?root.
+        ?i_from ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?i_from ?property2 ?root;
+          ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?root ?property2 ?i_from.
+        ?i_from ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?root ?property2 ?i_to.
         ?i_from ?property1 ?i_to.
         FILTER(STRSTARTS(STR(?property2), str(wdt:)))
         FILTER(STRSTARTS(STR(?property1), str(wdt:)))
