@@ -1,0 +1,28 @@
+SELECT ?i_from ?i_fromLabel ?rc_propertyLabel ?i_to ?i_toLabel WHERE {
+  VALUES ?root {
+    wd:Q460387
+  }
+  {
+    BIND(?root AS ?i_to)
+    ?i_from ?property1 ?root.
+    FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+  }
+  UNION
+  {
+    ?i_to ?property2 ?root.
+    ?i_from ?property1 ?i_to.
+    FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+    FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+  }
+  UNION
+  {
+    ?i_mid ?property3 ?root.
+    ?i_to ?property2 ?i_mid.
+    ?i_from ?property1 ?i_to.
+    FILTER(STRSTARTS(STR(?property3), str(wdt:)))
+    FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+    FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+  OPTIONAL { ?rc_property wikibase:directClaim ?property1. }
+}
