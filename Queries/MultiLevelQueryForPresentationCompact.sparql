@@ -11,6 +11,8 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         FILTER(?property != wdt:P1343)
         FILTER(?property != wdt:P5008)
         FILTER(?property != wdt:P495)
+        FILTER(?property != wdt:P2596)
+        FILTER(?property != wdt:P17)
       }
       UNION
       {
@@ -20,11 +22,13 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         FILTER(?property != wdt:P1343)
         FILTER(?property != wdt:P5008)
         FILTER(?property != wdt:P495)
+        FILTER(?property != wdt:P2596)
+        FILTER(?property != wdt:P17)
       }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property. }
     }
-    LIMIT 500
+    LIMIT 5000
   }
   FILTER(LANG(?i_fromLabel))
   FILTER(LANG(?i_toLabel))
