@@ -1,0 +1,28 @@
+SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription ?ii_toImage WHERE {
+  {
+    SELECT DISTINCT ?i_from ?i_fromLabel ?i_fromDescription ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription WHERE {
+      VALUES ?root {
+        wd:Q37200
+      }
+      {
+        BIND(?root AS ?i_from)
+        ?root ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?root ?property1 ?i_to.
+        ?i_from ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+      OPTIONAL { ?rc_property wikibase:directClaim ?property1. }
+    }
+    LIMIT 10000
+  }
+  FILTER(LANG(?i_fromLabel))
+  FILTER(LANG(?i_toLabel))
+  OPTIONAL { ?i_from wdt:P18 ?ii_fromImage. }
+  OPTIONAL { ?i_to wdt:P18 ?ii_toImage. }
+  FILTER (BOUND(?ii_fromImage) || BOUND(?ii_toImage))
+}
