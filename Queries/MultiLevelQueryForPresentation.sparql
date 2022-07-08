@@ -1,0 +1,66 @@
+SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription ?ii_toImage WHERE {
+  {
+    SELECT DISTINCT ?i_from ?i_fromLabel ?i_fromDescription ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription WHERE {
+      VALUES ?root {
+        wd:Q37200
+      }
+      {
+        BIND(?root AS ?i_to)
+        ?i_from ?property1 ?root.
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        BIND(?root AS ?i_from)
+        ?root ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?i_to ?property2 ?root.
+        ?i_from ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?i_from ?property2 ?root;
+          ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?root ?property2 ?i_from.
+        ?i_from ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?root ?property2 ?i_to.
+        ?i_from ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      UNION
+      {
+        ?i_mid ?property3 ?root.
+        ?i_to ?property2 ?i_mid.
+        ?i_from ?property1 ?i_to.
+        FILTER(STRSTARTS(STR(?property3), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property2), str(wdt:)))
+        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+      }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+      OPTIONAL { ?rc_property wikibase:directClaim ?property1. }
+    }
+    LIMIT 10000
+  }
+  FILTER(LANG(?i_fromLabel))
+  FILTER(LANG(?i_toLabel))
+  OPTIONAL { ?i_from wdt:P18 ?ii_fromImage. }
+  OPTIONAL { ?i_to wdt:P18 ?ii_toImage. }
+  FILTER (BOUND(?ii_fromImage))
+  FILTER (BOUND(?ii_toImage))
+}
