@@ -55,6 +55,7 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription (?i_from as ?iu_from) ?ii_fromIma
       SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property1. }
     }
+    LIMIT 10000
   }
   FILTER(LANG(?i_fromLabel))
   FILTER(LANG(?i_toLabel))
