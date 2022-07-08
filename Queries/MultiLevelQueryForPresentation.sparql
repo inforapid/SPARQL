@@ -52,7 +52,7 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         FILTER(STRSTARTS(STR(?property2), str(wdt:)))
         FILTER(STRSTARTS(STR(?property1), str(wdt:)))
       }
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property1. }
     }
     LIMIT 10000
