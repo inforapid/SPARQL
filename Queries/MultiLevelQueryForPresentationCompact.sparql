@@ -8,28 +8,14 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         BIND(?root AS ?i_from)
         ?root ?property ?i_to.
         FILTER(STRSTARTS(STR(?property), str(wdt:)))
-        FILTER(?property != wdt:P1343)
-        FILTER(?property != wdt:P5008)
-        FILTER(?property != wdt:P495)
-        FILTER(?property != wdt:P2596)
-        FILTER(?property != wdt:P17)
-        FILTER(?property != wdt:P31)
-        FILTER(?property != wdt:P131)
-        FILTER(?property != wdt:P186)
+        FILTER (?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186))
       }
       UNION
       {
         ?root ?property ?i_to.
         ?i_from ?property ?i_to.
         FILTER(STRSTARTS(STR(?property), str(wdt:)))
-        FILTER(?property != wdt:P1343)
-        FILTER(?property != wdt:P5008)
-        FILTER(?property != wdt:P495)
-        FILTER(?property != wdt:P2596)
-        FILTER(?property != wdt:P17)
-        FILTER(?property != wdt:P31)
-        FILTER(?property != wdt:P131)
-        FILTER(?property != wdt:P186)
+        FILTER (?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186))
       }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property. }
