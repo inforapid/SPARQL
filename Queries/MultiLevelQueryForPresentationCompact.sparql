@@ -15,6 +15,7 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         FILTER(?property != wdt:P17)
         FILTER(?property != wdt:P31)
         FILTER(?property != wdt:P131)
+        FILTER(?property != wdt:P186)
       }
       UNION
       {
@@ -28,6 +29,7 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         FILTER(?property != wdt:P17)
         FILTER(?property != wdt:P31)
         FILTER(?property != wdt:P131)
+        FILTER(?property != wdt:P186)
       }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property. }
