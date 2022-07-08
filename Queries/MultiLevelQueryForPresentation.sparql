@@ -61,6 +61,5 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
   FILTER(LANG(?i_toLabel))
   OPTIONAL { ?i_from wdt:P18 ?ii_fromImage. }
   OPTIONAL { ?i_to wdt:P18 ?ii_toImage. }
-  FILTER (BOUND(?ii_fromImage))
-  FILTER (BOUND(?ii_toImage))
+  FILTER (BOUND(?ii_fromImage) || BOUND(?ii_toImage))
 }
