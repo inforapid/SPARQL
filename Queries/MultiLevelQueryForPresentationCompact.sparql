@@ -6,17 +6,17 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
       }
       {
         BIND(?root AS ?i_from)
-        ?root ?property1 ?i_to.
-        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+        ?root ?property ?i_to.
+        FILTER(STRSTARTS(STR(?property), str(wdt:)))
       }
       UNION
       {
-        ?root ?property1 ?i_to.
-        ?i_from ?property1 ?i_to.
-        FILTER(STRSTARTS(STR(?property1), str(wdt:)))
+        ?root ?property ?i_to.
+        ?i_from ?property ?i_to.
+        FILTER(STRSTARTS(STR(?property), str(wdt:)))
       }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-      OPTIONAL { ?rc_property wikibase:directClaim ?property1. }
+      OPTIONAL { ?rc_property wikibase:directClaim ?property. }
     }
     LIMIT 10000
   }
