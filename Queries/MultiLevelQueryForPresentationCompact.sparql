@@ -10,6 +10,7 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         FILTER(STRSTARTS(STR(?property), str(wdt:)))
         FILTER(?property != wdt:P1343)
         FILTER(?property != wdt:P5008)
+        FILTER(?property != wdt:P495)
       }
       UNION
       {
@@ -18,6 +19,7 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         FILTER(STRSTARTS(STR(?property), str(wdt:)))
         FILTER(?property != wdt:P1343)
         FILTER(?property != wdt:P5008)
+        FILTER(?property != wdt:P495)
       }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property. }
