@@ -8,23 +8,23 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
         BIND(?root AS ?i_from)
         ?root ?property ?i_to.
         FILTER(STRSTARTS(STR(?property), str(wdt:)))
-        FILTER(?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910))
+        FILTER(?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910, wdt:P1424))
       }
       UNION
       {
         ?root ?property ?i_to.
         ?i_from ?property ?i_to.
         FILTER(STRSTARTS(STR(?property), str(wdt:)))
-        FILTER(?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910))
+        FILTER(?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910, wdt:P1424))
       }
       UNION
       {
         ?root ?property1 ?i_from.
         ?i_from ?property ?i_to.
         FILTER(STRSTARTS(STR(?property1), str(wdt:)))
-        FILTER(?property1 NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910))
+        FILTER(?property1 NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910, wdt:P1424))
         FILTER(STRSTARTS(STR(?property), str(wdt:)))
-        FILTER(?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910))
+        FILTER(?property NOT IN (wdt:P1343, wdt:P5008, wdt:P495, wdt:P2596, wdt:P17, wdt:P31, wdt:P131, wdt:P186, wdt:P149, wdt:P910, wdt:P1424))
       }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property. }
