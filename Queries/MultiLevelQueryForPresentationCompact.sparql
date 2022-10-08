@@ -1,4 +1,4 @@
-SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription ?ii_toImage WHERE {
+SELECT ?i_from ?i_fromLabel ?i_fromDescription (?i_from as ?iu_from) ?ii_fromImage ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription (?i_to as ?iu_to) ?ii_toImage WHERE {
   {
     SELECT DISTINCT ?i_from ?i_fromLabel ?i_fromDescription ?rc_propertyLabel ?i_to ?i_toLabel ?i_toDescription WHERE {
       VALUES ?root {
@@ -29,7 +29,7 @@ SELECT ?i_from ?i_fromLabel ?i_fromDescription ?ii_fromImage ?rc_propertyLabel ?
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       OPTIONAL { ?rc_property wikibase:directClaim ?property. }
     }
-    LIMIT 5000
+    LIMIT 500
   }
   FILTER(LANG(?i_fromLabel))
   FILTER(LANG(?i_toLabel))
