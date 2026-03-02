@@ -85,7 +85,7 @@ WHERE {
 SELECT DISTINCT
 ?i_planet ?i_planetLabel ?i_planetDescription ?ii_planet ?iu_planet
 ?rn_relation1Label (?rn_relation1Label AS ?rc_relation1Label)
-?i_moon ?i_moonLabel ?i_moonDescription ?ii_moon ?iu_moon
+?i_moon ?i_moonLabel ?i_moonDescription ?ii_moon ?iu_moon ?radius
 WHERE {
 
   # Alle acht Planeten
@@ -107,6 +107,12 @@ WHERE {
   # Nur Monde (planetary moon oder regular moon)
   ?i_moon wdt:P31 ?moonType .
   VALUES ?moonType { wd:Q109645860 wd:Q1086783 }
+
+  # Radius in km
+  OPTIONAL { ?i_moon wdt:P2120 ?radius. }
+
+  # Filter: nur Monde mit Radius > 100 km
+  FILTER (BOUND(?radius) && ?radius > 100)
 
   # Optional: Bilder
   OPTIONAL { ?i_planet wdt:P18 ?ii_planet. }
