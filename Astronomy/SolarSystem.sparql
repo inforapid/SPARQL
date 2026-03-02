@@ -39,11 +39,32 @@ WHERE {
   VALUES ?i_item2 {
     wd:Q308   # Mercury
     wd:Q313   # Venus
-    wd:Q2     # Earth
+    wd:Q18589965 # Earth-Moon system
     wd:Q111   # Mars
   }
 
   wd:Q7879772 wdt:P527 ?i_item2 .
+
+  OPTIONAL { ?i_item1 wdt:P18 ?ii_item1. }
+  OPTIONAL { ?i_item2 wdt:P18 ?ii_item2. }
+  OPTIONAL { ?iu_item1 schema:about ?i_item1; schema:isPartOf <https://en.wikipedia.org/>. }
+  OPTIONAL { ?iu_item2 schema:about ?i_item2; schema:isPartOf <https://en.wikipedia.org/>. }
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+}
+
+#query
+SELECT DISTINCT
+?i_item1 ?i_item1Label ?i_item1Description ?ii_item1 ?iu_item1
+?rn_relation1Label (?rn_relation1Label AS ?rc_relation1Label)
+?i_item2 ?i_item2Label ?i_item2Description ?ii_item2 ?iu_item2
+WHERE {
+
+  VALUES ?i_item1 { wd:Q18589965 }   # iEarth-Moon system
+
+  ?rn_relation1 wikibase:directClaim wdt:P527 .
+
+  wd:Q18589965 wdt:P527 ?i_item2 .
 
   OPTIONAL { ?i_item1 wdt:P18 ?ii_item1. }
   OPTIONAL { ?i_item2 wdt:P18 ?ii_item2. }
