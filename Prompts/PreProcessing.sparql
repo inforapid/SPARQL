@@ -1,0 +1,48 @@
+SELECT ?subjektLabel ?propertyLabel ?objektLabel ?subjekt ?property ?objekt WHERE {
+  # Extended list of the most important celestial bodies (English labels)
+  VALUES (?subjektName ?objektName) {
+    # Planets orbiting the Sun
+    ("Sun"@en "Mercury"@en)
+    ("Sun"@en "Venus"@en)
+    ("Sun"@en "Earth"@en)
+    ("Sun"@en "Mars"@en)
+    ("Sun"@en "Jupiter"@en)
+    ("Sun"@en "Saturn"@en)
+    ("Sun"@en "Uranus"@en)
+    ("Sun"@en "Neptun"@en)
+    
+    # Important Moons and their parent planets
+    ("Earth"@en "Moon"@en)
+    ("Jupiter"@en "Io"@en)
+    ("Jupiter"@en "Europa"@en)
+    ("Jupiter"@en "Ganymede"@en)
+    ("Jupiter"@en "Callisto"@en)
+    ("Saturn"@en "Titan"@en)
+    ("Saturn"@en "Enceladus"@en)
+    ("Neptun"@en "Triton"@en)
+  }
+
+  # Step 1: Find the Q-number for the subject via its English label
+  ?subjekt rdfs:label ?subjektName.
+  FILTER(STRSTARTS(STR(?subjekt), "http://www.wikidata.org/entity/Q"))
+
+  # Step 2: Find the Q-number for the object via its English label
+  ?objekt rdfs:label ?objektName.
+  FILTER(STRSTARTS(STR(?objekt), "http://www.wikidata.org/entity/Q"))
+
+  # Type check: Must be an astronomical object (Q6999)
+  # This prevents getting movies, bands, or persons with the same name
+  FILTER EXISTS { ?subjekt wdt:P31/wdt:P279* wd:Q6999 . }
+  FILTER EXISTS { ?objekt wdt:P31/wdt:P279* wd:Q6999 . }  
+  
+  # Step 3: Check for relationships in both directions
+  # (Some are stored as "Sun -> has satellite -> Earth", others as "Moon -> orbits -> Earth")
+  ?subjekt ?p ?objekt.
+  
+  # Link the property ID to its direct claim
+  ?property wikibase:directClaim ?p.
+
+  # Label service for readable names in the results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "de,en". }
+}
+ORDER BY ?subjektLabel
