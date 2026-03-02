@@ -80,3 +80,41 @@ WHERE {
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
+
+#query
+SELECT DISTINCT
+?i_planet ?i_planetLabel ?i_planetDescription ?ii_planet ?iu_planet
+?rn_relation1Label (?rn_relation1Label AS ?rc_relation1Label)
+?i_moon ?i_moonLabel ?i_moonDescription ?ii_moon ?iu_moon
+WHERE {
+
+  # Alle acht Planeten
+  VALUES ?i_planet { 
+    wd:Q308   # Mercury
+    wd:Q313   # Venus
+    wd:Q2     # Earth
+    wd:Q111   # Mars
+    wd:Q319   # Jupiter
+    wd:Q193   # Saturn
+    wd:Q324   # Uranus
+    wd:Q332   # Neptune
+  }
+
+  # Relation: Planet → Moon
+  ?rn_relation1 wikibase:directClaim wdt:P398 .  # has part
+  ?i_planet wdt:P398 ?i_moon .
+
+  # Nur Monde (planetary moon oder regular moon)
+  ?i_moon wdt:P31 ?moonType .
+  VALUES ?moonType { wd:Q109645860 wd:Q1086783 }
+
+  # Optional: Bilder
+  OPTIONAL { ?i_planet wdt:P18 ?ii_planet. }
+  OPTIONAL { ?i_moon wdt:P18 ?ii_moon. }
+
+  # Optional: Wikipedia URLs
+  OPTIONAL { ?iu_planet schema:about ?i_planet; schema:isPartOf <https://en.wikipedia.org/>. }
+  OPTIONAL { ?iu_moon schema:about ?i_moon; schema:isPartOf <https://en.wikipedia.org/>. }
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+}
