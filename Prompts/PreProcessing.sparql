@@ -49,16 +49,38 @@ SELECT DISTINCT ?subjektLabel ?propertyLabel ?objektLabel ?subjekt ?property ?ob
   {
     # WAY B: Automatic physical facts for all subjects
     # Define which facts you want to include by default
-    VALUES (?propItem ?p_direct ?einheit) {
-      (wd:P2386 wdt:P2386 " km") # Durchmesser
-      (wd:P2067 wdt:P2067 " kg") # Masse
-      (wd:P2102 wdt:P2102 " K")  # Temperatur
+    VALUES (?physProp ?pProp ?psvProp) {
+      (wdt:P2386 p:P2386 psv:P2386) # Durchmesser
+      (wdt:P2067 p:P2067 psv:P2067) # Masse
+      (wdt:P2076 p:P2076 psv:P2076) # Temperatur
+      (wdt:P2120 p:P2120 psv:P2120) # Radius
+      (wdt:P2046 p:P2046 psv:P2046) # Fläche
+      (wdt:P2234 p:P2234 psv:P2234) # Volumen
+      (wdt:P2054 p:P2054 psv:P2054) # Dichte
+      (wdt:P2233 p:P2233 psv:P2233) # große Halbachse
+      (wdt:P1096 p:P1096 psv:P1096) # Exzentrizität
+      (wdt:P2146 p:P2146 psv:P2146) # Rotationsperiode
+      (wdt:P2583 p:P2583 psv:P2583) # Entfernung
+      (wdt:P4501 p:P4501 psv:P4501) # Albedo
     }
-    ?subjekt ?p_direct ?wert.
-    BIND(?propItem AS ?property)
-    BIND(CONCAT(STR(?wert), ?einheit) AS ?objektLabel)
-    # Create a dummy node for the value
-    BIND(IRI(CONCAT("https://wikidata.org/value/", MD5(STR(?wert)))) AS ?objekt)
+
+    # Wert-Struktur abrufen
+    ?subjekt ?pProp ?statement.
+    ?statement ?psvProp ?valueNode.
+    
+    ?valueNode wikibase:quantityAmount ?amount.
+    ?valueNode wikibase:quantityUnit ?unit.
+    
+    # Label der Einheit (falls vorhanden, sonst leer)
+    OPTIONAL { 
+      ?unit rdfs:label ?unitLabel. 
+      FILTER(LANG(?unitLabel) = "en") 
+    }
+
+    # Ergebnisse binden
+    BIND(CONCAT(STR(?amount), " ", REPLACE(STR(COALESCE(?unitLabel, "")), "http://www.wikidata.org/entity/", "")) AS ?objektLabel)
+    BIND(?physProp AS ?property)
+    BIND(?unit AS ?objekt)
   }
 
   # Label service for readable names in the results
