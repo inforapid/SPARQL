@@ -1,5 +1,6 @@
-SELECT ?subjektLabel ?propertyLabel ?objektLabel ?subjekt ?property ?objekt WHERE {
-  # Extended list of the most important celestial bodies (English labels)
+SELECT DISTINCT ?subjektLabel ?propertyLabel ?objektLabel ?subjekt ?property ?objekt WHERE {
+  
+  # Definition of the subject object pairs
   VALUES (?subjektName ?objektName) {
     # Planets orbiting the Sun
     ("Sun"@en "Mercury"@en)
@@ -27,22 +28,40 @@ SELECT ?subjektLabel ?propertyLabel ?objektLabel ?subjekt ?property ?objekt WHER
   FILTER(STRSTARTS(STR(?subjekt), "http://www.wikidata.org/entity/Q"))
 
   # Step 2: Find the Q-number for the object via its English label
-  ?objekt rdfs:label ?objektName.
-  FILTER(STRSTARTS(STR(?objekt), "http://www.wikidata.org/entity/Q"))
+  ?objekt_item rdfs:label ?objektName.
+  FILTER(STRSTARTS(STR(?objekt_item), "http://www.wikidata.org/entity/Q"))
 
   # Type check: Must be an astronomical object (Q6999)
   # This prevents getting movies, bands, or persons with the same name
   FILTER EXISTS { ?subjekt wdt:P31/wdt:P279* wd:Q6999 . }
-  FILTER EXISTS { ?objekt wdt:P31/wdt:P279* wd:Q6999 . }  
-  
-  # Step 3: Check for relationships in both directions
-  # (Some are stored as "Sun -> has satellite -> Earth", others as "Moon -> orbits -> Earth")
-  ?subjekt ?p ?objekt.
-  
-  # Link the property ID to its direct claim
-  ?property wikibase:directClaim ?p.
+  FILTER EXISTS { ?objekt_item wdt:P31/wdt:P279* wd:Q6999 . }  
+
+  {
+    # Step 3: Check for relationships in both directions
+    # (Some are stored as "Sun -> has satellite -> Earth", others as "Moon -> orbits -> Earth")
+    ?subjekt ?p ?objekt_item.
+    
+    # Link the property ID to its direct claim
+    ?property wikibase:directClaim ?p.
+    BIND(?objekt_item AS ?objekt)
+  }
+  UNION
+  {
+    # WAY B: Automatic physical facts for all subjects
+    # Define which facts you want to include by default
+    VALUES (?propItem ?p_direct ?einheit) {
+      (wd:P2386 wdt:P2386 " km") # Durchmesser
+      (wd:P2067 wdt:P2067 " kg") # Masse
+      (wd:P2102 wdt:P2102 " K")  # Temperatur
+    }
+    ?subjekt ?p_direct ?wert.
+    BIND(?propItem AS ?property)
+    BIND(CONCAT(STR(?wert), ?einheit) AS ?objektLabel)
+    # Create a dummy node for the value
+    BIND(IRI(CONCAT("https://wikidata.org/value/", MD5(STR(?wert)))) AS ?objekt)
+  }
 
   # Label service for readable names in the results
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "de,en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,de". }
 }
 ORDER BY ?subjektLabel
