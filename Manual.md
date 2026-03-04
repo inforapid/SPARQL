@@ -229,6 +229,70 @@ WHERE {
 
 ---
 
-## 13. Tips
+## 13. Useful SPARQL Code Snippets
+
+The following snippets are commonly used with the KnowledgeBase Builder to enrich your diagrams.
+
+### 13.1. Google Maps Links
+Create a clickable URL that opens the location of an item in Google Maps.
+```sparql
+OPTIONAL { 
+  ?i_place p:P625 ?statement.
+  ?statement psv:P625 ?coordinate_node.
+  ?coordinate_node wikibase:geoLatitude ?lat.
+  ?coordinate_node wikibase:geoLongitude ?long.
+  BIND (CONCAT ("http://www.google.com/maps/place/", STR(?lat), ",", STR(?long), "§if") AS ?iu_url).
+}
+```
+
+### 13.2. Wikipedia Links
+Fetch the English Wikipedia URL for an item.
+```sparql
+OPTIONAL { 
+  ?iu_wikipedia_url schema:about ?i_item; 
+  schema:isPartOf <https://en.wikipedia.org/> 
+}
+```
+
+### 13.3. Geospatial Queries (Radius Search)
+Find all places within a 10km radius of a central location.
+```sparql
+?centerPlace wdt:P625 ?centerLoc.
+SERVICE wikibase:around {
+  ?i_place wdt:P625 ?location. # the first statement must include the place and the location
+  bd:serviceParam wikibase:center ?centerLoc.
+  bd:serviceParam wikibase:radius "10". # maximum distance in kilometers
+  bd:serviceParam wikibase:distance ?dist. # current distance in kilometers
+}
+```
+
+### 13.4. Calculating and Formatting Distance
+Calculate the distance between two locations and format it for display.
+```sparql
+# Calculate distance
+BIND (geof:distance (?location1, ?location2) AS ?dist).
+
+# Round to 10m precision and add unit
+BIND (CONCAT (xsd:string (xsd:integer (CEIL (100 * ?dist) * 10)), " m") AS ?rounded_dist_in_m).
+```
+
+### 13.5. Dynamic Property Labels
+If item1 is connected to item2 through a property, use this to get the property name label.
+```sparql
+?item1 ?property ?item2.
+OPTIONAL { ?propertyName wikibase:directClaim ?property. }
+```
+
+### 13.6. Defining Constants
+Use `VALUES` to define a fixed item as a starting point.
+```sparql
+VALUES (?item) {(wd:Q138809)}
+```
+
+---
+
+## 14. Tips
+*   **Performance:** Use `OPTIONAL` to prevent timeouts wherever possible.
 *   **Separation:** Use `#query` at the start of a line to separate different queries within the same `.sparql` file.
 *   **Merging:** Because items are identified by URI (`i_`), you can define connections in one query and add categories or images in another; the tool will combine them.
+
