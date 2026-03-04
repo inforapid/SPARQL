@@ -196,10 +196,59 @@ Table relations allow you to store attributes (like "Date of Birth") as structur
 *   **Column 1:** The label of the `rn_t_` variable (the property name).
 *   **Column 2:** The value of the following `ic_` or `i_` variable.
 *   **Mapping:** The KnowledgeBase Builder groups these into the "Properties" table of the source node.
+*   **Source Node Logic:** By default, if a SELECT statement looks like `?i_item1 ... ?rn_t_prop ?ic_value`, the property is attached to `item1`. If multiple items are in the row, the tool uses **Implicit Branching** (see Section 4), meaning properties placed after several `i_` items are typically attached to the **first** item of that segment.
 
 ---
 
-## 12. Comprehensive Example
+## 12. Handling Values with Units
+
+When dealing with physical quantities (mass, temperature, distance), WikiData provides both a number and a unit. To display these correctly in the KnowledgeBase Builder (e.g., "5772 Kelvin"), you must manually combine them using SPARQL's string functions.
+
+### The "Amount + Unit" Pattern
+To fetch a value with its unit, you cannot use the simple `wdt:` prefix. You must navigate through the statement and the value node:
+
+```sparql
+OPTIONAL { 
+  # 1. Navigate to the statement (p:) and then to the specific value node (psv:)
+  ?i_item p:P2076/psv:P2076 [
+    wikibase:quantityAmount ?amount; 
+    wikibase:quantityUnit [rdfs:label ?unitLabel]
+  ]. 
+  
+  # 2. Filter the unit name to your preferred language
+  FILTER(LANG(?unitLabel)="en") 
+  
+  # 3. Merge amount and unit into a single string for the KnowledgeBase Builder
+  BIND(CONCAT(STR(?amount), " ", ?unitLabel) AS ?ic_ValueWithUnit) 
+  
+  # 4. Get the property name for the table header
+  ?rn_t_property wikibase:directClaim wdt:P2076. 
+}
+```
+
+### Why use `ic_` for values?
+Using the `ic_` (Item Category) prefix for these combined strings is recommended. It ensures that the value is treated as a property entry within the item's table, and the column header in your `SELECT` statement (e.g., `?ic_Temperature`) will be used as the category/label for that value.
+
+---
+
+## 13. Using `VALUES` for Input Data
+
+If you want to create a map for a specific set of items or compare specific pairs (like Sun/Earth, Jupiter/Io), you can define them at the start of your query using the `VALUES` block.
+
+```sparql
+WHERE {
+  VALUES (?i_item1 ?i_item2) {
+    (wd:Q525 wd:Q2)    # Sun and Earth
+    (wd:Q319 wd:Q3123) # Jupiter and Io
+  }
+  # ... rest of the query
+}
+```
+This is much more efficient than fetching all items of a class if you already know which specific entities you are interested in.
+
+---
+
+## 14. Comprehensive Example
 
 This query extracts descendants of Elizabeth II, mapping family connections as lines and biographical data as table entries.
 
@@ -229,11 +278,11 @@ WHERE {
 
 ---
 
-## 13. Useful SPARQL Code Snippets
+## 15. Useful SPARQL Code Snippets
 
 The following snippets are commonly used with the KnowledgeBase Builder to enrich your diagrams.
 
-### 13.1. Google Maps Links
+### 15.1. Google Maps Links
 Create a clickable URL that opens the location of an item in Google Maps.
 ```sparql
 OPTIONAL { 
@@ -245,7 +294,7 @@ OPTIONAL {
 }
 ```
 
-### 13.2. Wikipedia Links
+### 15.2. Wikipedia Links
 Fetch the English Wikipedia URL for an item.
 ```sparql
 OPTIONAL { 
@@ -254,7 +303,7 @@ OPTIONAL {
 }
 ```
 
-### 13.3. Geospatial Queries (Radius Search)
+### 15.3. Geospatial Queries (Radius Search)
 Find all places within a 10km radius of a central location.
 ```sparql
 ?centerPlace wdt:P625 ?centerLoc.
@@ -266,7 +315,7 @@ SERVICE wikibase:around {
 }
 ```
 
-### 13.4. Calculating and Formatting Distance
+### 15.4. Calculating and Formatting Distance
 Calculate the distance between two locations and format it for display.
 ```sparql
 # Calculate distance
@@ -276,14 +325,14 @@ BIND (geof:distance (?location1, ?location2) AS ?dist).
 BIND (CONCAT (xsd:string (xsd:integer (CEIL (100 * ?dist) * 10)), " m") AS ?rounded_dist_in_m).
 ```
 
-### 13.5. Dynamic Property Labels
+### 15.5. Dynamic Property Labels
 If item1 is connected to item2 through a property, use this to get the property name label.
 ```sparql
 ?item1 ?property ?item2.
 OPTIONAL { ?propertyName wikibase:directClaim ?property. }
 ```
 
-### 13.6. Defining Constants
+### 15.6. Defining Constants
 Use `VALUES` to define a fixed item as a starting point.
 ```sparql
 VALUES (?item) {(wd:Q138809)}
@@ -291,7 +340,7 @@ VALUES (?item) {(wd:Q138809)}
 
 ---
 
-## 14. Tips
+## 16. Tips
 *   **Performance:** Use `OPTIONAL` to prevent timeouts wherever possible.
 *   **Separation:** Use `#query` at the start of a line to separate different queries within the same `.sparql` file.
 *   **Merging:** Because items are identified by URI (`i_`), you can define connections in one query and add categories or images in another; the tool will combine them.
