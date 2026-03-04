@@ -1,50 +1,87 @@
+# Query 1: Strukturaufbau (Verbindungen zwischen Sonne, Planeten und Monden)
 SELECT 
-?i_item1 ?i_item1Label ?i_item1Description ?ii_item1 ?iu_item1
-?rn_prop1Label (?rn_prop1Label as ?rc_prop1Label) ?i_item2 ?i_item2Label ?i_item2Description ?ii_item2 ?iu_item2
-?rn_t_P2146Label (?rn_t_P2146Label as ?rc_P2146Label) ?ic_P2146
-?rn_t_P2076Label (?rn_t_P2076Label as ?rc_P2076Label) ?ic_P2076
-?rn_t_P2233Label (?rn_t_P2233Label as ?rc_P2233Label) ?ic_P2233
-?rn_t_P2067Label (?rn_t_P2067Label as ?rc_P2067Label) ?ic_P2067
-?rn_t_P2120Label (?rn_t_P2120Label as ?rc_P2120Label) ?ic_P2120
-?rn_t_P2583Label (?rn_t_P2583Label as ?rc_P2583Label) ?ic_P2583
-?rn_t_P2386Label (?rn_t_P2386Label as ?rc_P2386Label) ?ic_P2386
-?rn_t_P2046Label (?rn_t_P2046Label as ?rc_P2046Label) ?ic_P2046
-?rn_t_P2234Label (?rn_t_P2234Label as ?rc_P2234Label) ?ic_P2234
-?rn_t_P2054Label (?rn_t_P2054Label as ?rc_P2054Label) ?ic_P2054
-?rn_t_P4501Label (?rn_t_P4501Label as ?rc_P4501Label) ?ic_P4501
-?rn_t_P1096Label (?rn_t_P1096Label as ?rc_P1096Label) ?ic_P1096
-
+  ?i_item1 ?i_item1Label ?i_item1Description
+  ?rn_prop1Label (?rn_prop1Label as ?rc_prop1Label) 
+  ?i_item2 ?i_item2Label ?i_item2Description
 WHERE {
+  # Definition der Hierarchie
   VALUES (?i_item1 ?i_item2) {
-    (wd:Q2 wd:Q405) (wd:Q319 wd:Q3123) (wd:Q319 wd:Q3134) (wd:Q319 wd:Q3143) (wd:Q319 wd:Q3169)
-    (wd:Q193 wd:Q2565) (wd:Q193 wd:Q3303) (wd:Q525 wd:Q2) (wd:Q525 wd:Q111) (wd:Q525 wd:Q193)
-    (wd:Q525 wd:Q308) (wd:Q525 wd:Q313) (wd:Q525 wd:Q319) (wd:Q525 wd:Q324)
+    (wd:Q525 wd:Q2) (wd:Q525 wd:Q111) (wd:Q525 wd:Q193) (wd:Q525 wd:Q308) 
+    (wd:Q525 wd:Q313) (wd:Q525 wd:Q319) (wd:Q525 wd:Q324)
+    (wd:Q2 wd:Q405) (wd:Q319 wd:Q3123) (wd:Q319 wd:Q3134) 
+    (wd:Q319 wd:Q3143) (wd:Q319 wd:Q3169) (wd:Q193 wd:Q2565) (wd:Q193 wd:Q3303)
   }
 
-  # Edge: Child body
+  # Beziehungstyp (z.B. "child astronomical body")
   OPTIONAL { ?i_item1 wdt:P398 ?i_item2. ?rn_prop1 wikibase:directClaim wdt:P398. }
 
-  # Table Properties mit Einheiten (Kompakt-Pattern)
-  OPTIONAL { ?i_item1 p:P2146/psv:P2146 [wikibase:quantityAmount ?a2146; wikibase:quantityUnit [rdfs:label ?u2146]]. FILTER(LANG(?u2146)="de") BIND(CONCAT(STR(?a2146)," ",?u2146) AS ?ic_P2146) ?rn_t_P2146 wikibase:directClaim wdt:P2146. }
-  OPTIONAL { ?i_item1 p:P2076/psv:P2076 [wikibase:quantityAmount ?a2076; wikibase:quantityUnit [rdfs:label ?u2076]]. FILTER(LANG(?u2076)="de") BIND(CONCAT(STR(?a2076)," ",?u2076) AS ?ic_P2076) ?rn_t_P2076 wikibase:directClaim wdt:P2076. }
-  OPTIONAL { ?i_item1 p:P2233/psv:P2233 [wikibase:quantityAmount ?a2233; wikibase:quantityUnit [rdfs:label ?u2233]]. FILTER(LANG(?u2233)="de") BIND(CONCAT(STR(?a2233)," ",?u2233) AS ?ic_P2233) ?rn_t_P2233 wikibase:directClaim wdt:P2233. }
-  OPTIONAL { ?i_item1 p:P2067/psv:P2067 [wikibase:quantityAmount ?a2067; wikibase:quantityUnit [rdfs:label ?u2067]]. FILTER(LANG(?u2067)="de") BIND(CONCAT(STR(?a2067)," ",?u2067) AS ?ic_P2067) ?rn_t_P2067 wikibase:directClaim wdt:P2067. }
-  OPTIONAL { ?i_item1 p:P2120/psv:P2120 [wikibase:quantityAmount ?a2120; wikibase:quantityUnit [rdfs:label ?u2120]]. FILTER(LANG(?u2120)="de") BIND(CONCAT(STR(?a2120)," ",?u2120) AS ?ic_P2120) ?rn_t_P2120 wikibase:directClaim wdt:P2120. }
-  OPTIONAL { ?i_item1 p:P2583/psv:P2583 [wikibase:quantityAmount ?a2583; wikibase:quantityUnit [rdfs:label ?u2583]]. FILTER(LANG(?u2583)="de") BIND(CONCAT(STR(?a2583)," ",?u2583) AS ?ic_P2583) ?rn_t_P2583 wikibase:directClaim wdt:P2583. }
-  OPTIONAL { ?i_item1 p:P2386/psv:P2386 [wikibase:quantityAmount ?a2386; wikibase:quantityUnit [rdfs:label ?u2386]]. FILTER(LANG(?u2386)="de") BIND(CONCAT(STR(?a2386)," ",?u2386) AS ?ic_P2386) ?rn_t_P2386 wikibase:directClaim wdt:P2386. }
-  OPTIONAL { ?i_item1 p:P2046/psv:P2046 [wikibase:quantityAmount ?a2046; wikibase:quantityUnit [rdfs:label ?u2046]]. FILTER(LANG(?u2046)="de") BIND(CONCAT(STR(?a2046)," ",?u2046) AS ?ic_P2046) ?rn_t_P2046 wikibase:directClaim wdt:P2046. }
-  OPTIONAL { ?i_item1 p:P2234/psv:P2234 [wikibase:quantityAmount ?a2234; wikibase:quantityUnit [rdfs:label ?u2234]]. FILTER(LANG(?u2234)="de") BIND(CONCAT(STR(?a2234)," ",?u2234) AS ?ic_P2234) ?rn_t_P2234 wikibase:directClaim wdt:P2234. }
-  OPTIONAL { ?i_item1 p:P2054/psv:P2054 [wikibase:quantityAmount ?a2054; wikibase:quantityUnit [rdfs:label ?u2054]]. FILTER(LANG(?u2054)="de") BIND(CONCAT(STR(?a2054)," ",?u2054) AS ?ic_P2054) ?rn_t_P2054 wikibase:directClaim wdt:P2054. }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,de". }
+}
+
+#query
+# Query 2: Anreicherung mit Werten (Metadaten und physikalische Eigenschaften)
+SELECT 
+  ?i_item ?i_itemLabel ?i_itemDescription ?ii_item ?iu_item
+  ?rn_t_P2076Label (?rn_t_P2076Label as ?rc_P2076Label) ?ic_Temperature
+  ?rn_t_P2067Label (?rn_t_P2067Label as ?rc_P2067Label) ?ic_Mass
+  ?rn_t_P2146Label (?rn_t_P2146Label as ?rc_P2146Label) ?ic_RotationPeriod
+  ?rn_t_P2120Label (?rn_t_P2120Label as ?rc_P2120Label) ?ic_Radius
+  ?rn_t_P2386Label (?rn_t_P2386Label as ?rc_P2386Label) ?ic_Diameter
+  ?rn_t_P2054Label (?rn_t_P2054Label as ?rc_P2054Label) ?ic_Density
+  ?rn_t_P2046Label (?rn_t_P2046Label as ?rc_P2046Label) ?ic_Area
+  ?rn_t_P2234Label (?rn_t_P2234Label as ?rc_P2234Label) ?ic_Volume
+WHERE {
+  # Alle Objekte aus der ersten Query für die Details geladen werden sollen
+  VALUES ?i_item {
+    wd:Q525 wd:Q2 wd:Q111 wd:Q193 wd:Q308 wd:Q313 wd:Q319 wd:Q324
+    wd:Q405 wd:Q3123 wd:Q3134 wd:Q3143 wd:Q3169 wd:Q2565 wd:Q3303
+  }
   
-  # Literale (einfachere Werte)
-  OPTIONAL { ?i_item1 wdt:P4501 ?ic_P4501. ?rn_t_P4501 wikibase:directClaim wdt:P4501. }
-  OPTIONAL { ?i_item1 wdt:P1096 ?ic_P1096. ?rn_t_P1096 wikibase:directClaim wdt:P1096. }
+  # Metadaten (Bilder und Wikipedia-Links)
+  OPTIONAL { ?i_item wdt:P18 ?ii_item. }
+  OPTIONAL { ?iu_item schema:about ?i_item; schema:isPartOf <https://en.wikipedia.org/>. }
 
-  # Metadata
-  OPTIONAL { ?i_item1 wdt:P18 ?ii_item1. }
-  OPTIONAL { ?iu_item1 schema:about ?i_item1; schema:isPartOf <https://en.wikipedia.org/>. }
-  OPTIONAL { ?i_item2 wdt:P18 ?ii_item2. }
-  OPTIONAL { ?iu_item2 schema:about ?i_item2; schema:isPartOf <https://en.wikipedia.org/>. }
+  # Physikalische Eigenschaften mit Einheit (Template aus Handbuch 12)
+  OPTIONAL { 
+    ?i_item p:P2076/psv:P2076 [wikibase:quantityAmount ?a2076; wikibase:quantityUnit [rdfs:label ?u2076]].
+    FILTER(LANG(?u2076)="en") BIND(CONCAT(STR(?a2076)," ",?u2076) AS ?ic_Temperature)
+    ?rn_t_P2076 wikibase:directClaim wdt:P2076.
+  }
+  OPTIONAL { 
+    ?i_item p:P2067/psv:P2067 [wikibase:quantityAmount ?a2067; wikibase:quantityUnit [rdfs:label ?u2067]].
+    FILTER(LANG(?u2067)="en") BIND(CONCAT(STR(?a2067)," ",?u2067) AS ?ic_Mass)
+    ?rn_t_P2067 wikibase:directClaim wdt:P2067.
+  }
+  OPTIONAL { 
+    ?i_item p:P2146/psv:P2146 [wikibase:quantityAmount ?a2146; wikibase:quantityUnit [rdfs:label ?u2146]].
+    FILTER(LANG(?u2146)="en") BIND(CONCAT(STR(?a2146)," ",?u2146) AS ?ic_RotationPeriod)
+    ?rn_t_P2146 wikibase:directClaim wdt:P2146.
+  }
+  OPTIONAL { 
+    ?i_item p:P2120/psv:P2120 [wikibase:quantityAmount ?a2120; wikibase:quantityUnit [rdfs:label ?u2120]].
+    FILTER(LANG(?u2120)="en") BIND(CONCAT(STR(?a2120)," ",?u2120) AS ?ic_Radius)
+    ?rn_t_P2120 wikibase:directClaim wdt:P2120.
+  }
+  OPTIONAL { 
+    ?i_item p:P2386/psv:P2386 [wikibase:quantityAmount ?a2386; wikibase:quantityUnit [rdfs:label ?u2386]].
+    FILTER(LANG(?u2386)="en") BIND(CONCAT(STR(?a2386)," ",?u2386) AS ?ic_Diameter)
+    ?rn_t_P2386 wikibase:directClaim wdt:P2386.
+  }
+  OPTIONAL { 
+    ?i_item p:P2054/psv:P2054 [wikibase:quantityAmount ?a2054; wikibase:quantityUnit [rdfs:label ?u2054]].
+    FILTER(LANG(?u2054)="en") BIND(CONCAT(STR(?a2054)," ",?u2054) AS ?ic_Density)
+    ?rn_t_P2054 wikibase:directClaim wdt:P2054.
+  }
+  OPTIONAL { 
+    ?i_item p:P2046/psv:P2046 [wikibase:quantityAmount ?a2046; wikibase:quantityUnit [rdfs:label ?u2046]].
+    FILTER(LANG(?u2046)="en") BIND(CONCAT(STR(?a2046)," ",?u2046) AS ?ic_Area)
+    ?rn_t_P2046 wikibase:directClaim wdt:P2046.
+  }
+  OPTIONAL { 
+    ?i_item p:P2234/psv:P2234 [wikibase:quantityAmount ?a2234; wikibase:quantityUnit [rdfs:label ?u2234]].
+    FILTER(LANG(?u2234)="en") BIND(CONCAT(STR(?a2234)," ",?u2234) AS ?ic_Volume)
+    ?rn_t_P2234 wikibase:directClaim wdt:P2234.
+  }
 
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,de". }
 }
