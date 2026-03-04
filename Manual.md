@@ -345,3 +345,52 @@ VALUES (?item) {(wd:Q138809)}
 *   **Separation:** Use `#query` at the start of a line to separate different queries within the same `.sparql` file.
 *   **Merging:** Because items are identified by URI (`i_`), you can define connections in one query and add categories or images in another; the tool will combine them.
 
+---
+
+## 17. Handling Multi-Value Properties and Row Explosion
+
+When a WikiData item has multiple values for the same property (e.g., Venus has several values for temperature: mean, maximum, etc.), using multiple `OPTIONAL` blocks in a single `SELECT` statement leads to a **Cartesian product**. 
+
+If an item has 3 temperature values and 3 radius values, the query will return **9 rows** (3x3). This causes the KnowledgeBase Builder to duplicate data or misalign table entries.
+
+### 17.1. The UNION Strategy
+To prevent this "row explosion," fetch each property in a separate `UNION` block. This produces a "long" result set (rows are added instead of columns multiplied). The KnowledgeBase Builder then merges these rows based on the unique `i_` ID.
+
+### 17.2. Dynamic Labels using Qualifiers
+To distinguish between multiple values (e.g., "Radius (equator)" vs "Radius (mean)"), you should fetch the **Qualifiers** from WikiData and use them to build a dynamic Table Relation label (`rn_t_`).
+
+**Implementation Example:**
+```sparql
+SELECT ?i_item ?rn_t_Label (?rn_t_Label as ?rc_Label) ?ic_Value
+WHERE {
+  {
+    # Block 1: Temperature
+    ?i_item p:P2076 ?stat. 
+    ?stat psv:P2076 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
+    # Optional: Get qualifier (e.g. "mean" or "surface")
+    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
+    
+    # Get the property name dynamically
+    ?prop wikibase:directClaim wdt:P2076. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
+    
+    # Build a specific label: "Temperature (surface)"
+    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
+  }
+  UNION
+  {
+    # Block 2: Radius (analogous to above)
+    ?i_item p:P2120 ?stat. 
+    ...
+  }
+  
+  # Format the value with unit
+  FILTER(LANG(?unit)="en")
+  BIND(CONCAT(STR(?amt), " ", ?unit) AS ?ic_Value)
+}
+```
+
+### Benefits of this approach:
+1.  **Correctness:** No row explosion, ensuring the tool assigns values correctly.
+2.  **Precision:** The table in the MindMap will show specific rows like "Radius (equator)" and "Radius (polar)" instead of just multiple entries named "Radius".
+3.  **Flexibility:** You can add as many `UNION` blocks as needed without affecting the performance of other property fetches.
+
