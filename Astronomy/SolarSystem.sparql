@@ -13,9 +13,9 @@ WHERE {
     # Monde
     (wd:Q2 wd:Q405 "moon")
     (wd:Q319 wd:Q3123 "moon") (wd:Q319 wd:Q3134 "moon") (wd:Q319 wd:Q3143 "moon") (wd:Q319 wd:Q3169 "moon")
-    (wd:Q193 wd:Q2565 "moon") (wd:Q193 wd:Q3303 "moon")
+    (wd:Q193 wd:Q2565 "moon")
     (wd:Q332 wd:Q3359 "moon")
-    (wd:Q339 wd:Q6604 "moon") (wd:Q339 wd:Q102694 "moon") (wd:Q339 wd:Q102701 "moon")
+    (wd:Q339 wd:Q6604 "moon")
     
     # Raumfahrtmissionen (aus data.csv)
     (wd:Q308 wd:Q182539 "landing site")
