@@ -4,97 +4,62 @@ SELECT
   ?rn_prop1Label (?rn_prop1Label as ?rc_prop1Label) 
   ?i_item2 ?i_item2Label ?i_item2Description
 WHERE {
-  VALUES (?i_item1 ?i_item2) {
-    (wd:Q525 wd:Q2) (wd:Q525 wd:Q111) (wd:Q525 wd:Q193) (wd:Q525 wd:Q308) 
-    (wd:Q525 wd:Q313) (wd:Q525 wd:Q319) (wd:Q525 wd:Q324)
-    (wd:Q2 wd:Q405) (wd:Q319 wd:Q3123) (wd:Q319 wd:Q3134) 
-    (wd:Q319 wd:Q3143) (wd:Q319 wd:Q3169) (wd:Q193 wd:Q2565) (wd:Q193 wd:Q3303)
+  VALUES (?i_item1 ?i_item2 ?rn_prop1Label) {
+    # Planeten in der Reihenfolge ihres Abstands von der Sonne
+    (wd:Q525 wd:Q308 "planet") (wd:Q525 wd:Q313 "planet") (wd:Q525 wd:Q2 "planet")
+    (wd:Q525 wd:Q111 "planet") (wd:Q525 wd:Q319 "planet") (wd:Q525 wd:Q193 "planet")
+    (wd:Q525 wd:Q324 "planet") (wd:Q525 wd:Q332 "planet") (wd:Q525 wd:Q339 "planet")
+    
+    # Monde
+    (wd:Q2 wd:Q405 "moon")
+    (wd:Q319 wd:Q3123 "moon") (wd:Q319 wd:Q3134 "moon") (wd:Q319 wd:Q3143 "moon") (wd:Q319 wd:Q3169 "moon")
+    (wd:Q193 wd:Q2565 "moon") (wd:Q193 wd:Q3303 "moon")
+    (wd:Q332 wd:Q3359 "moon")
+    (wd:Q339 wd:Q6604 "moon") (wd:Q339 wd:Q102694 "moon") (wd:Q339 wd:Q102701 "moon")
+    
+    # Raumfahrtmissionen (aus data.csv)
+    (wd:Q308 wd:Q182539 "landing site")
+    (wd:Q313 wd:Q152800 "landing site") (wd:Q313 wd:Q719613 "landing site") (wd:Q313 wd:Q728292 "landing site") (wd:Q313 wd:Q372064 "landing site") (wd:Q313 wd:Q113129811 "landing site")
+    (wd:Q111 wd:Q201771 "landing site") (wd:Q111 wd:Q4011609 "landing site") (wd:Q111 wd:Q48485 "landing site") (wd:Q111 wd:Q87749354 "landing site")
+    (wd:Q319 wd:Q19878355 "landing site")
   }
-  OPTIONAL { ?i_item1 wdt:P398 ?i_item2. ?rn_prop1 wikibase:directClaim wdt:P398. }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,de". }
 }
 
 #query
-# Query 2: Anreicherung mit Werten (Robustes Multi-Value Handling via UNION)
+# Query 2: Anreicherung mit Werten (Masse und Radius)
 SELECT 
   ?i_item ?i_itemLabel ?i_itemDescription ?ii_item ?iu_item
   ?rn_t_Label (?rn_t_Label as ?rc_Label) ?ic_Value
 WHERE {
-  # Alle beteiligten IDs
+  # Alle beteiligten IDs aus data.csv
   VALUES ?i_item {
-    wd:Q525 wd:Q2 wd:Q111 wd:Q193 wd:Q308 wd:Q313 wd:Q319 wd:Q324
-    wd:Q405 wd:Q3123 wd:Q3134 wd:Q3143 wd:Q3169 wd:Q2565 wd:Q3303
+    wd:Q525 wd:Q308 wd:Q313 wd:Q2 wd:Q111 wd:Q319 wd:Q193 wd:Q324 wd:Q332 wd:Q339
+    wd:Q405 wd:Q3123 wd:Q3134 wd:Q3143 wd:Q3169 wd:Q2565 wd:Q3303 wd:Q3359
+    wd:Q6604 wd:Q102694 wd:Q102701 wd:Q182539 wd:Q152800 wd:Q201771
+    wd:Q719613 wd:Q728292 wd:Q372064 wd:Q113129811 wd:Q4011609 wd:Q48485 wd:Q87749354 wd:Q19878355
   }
   
   {
-    # 1. Temperatur (P2076)
-    ?i_item p:P2076 ?stat. 
-    ?stat psv:P2076 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
-    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
-    ?prop wikibase:directClaim wdt:P2076. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
-    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
-  } UNION {
-    # 2. Masse (P2067)
+    # 1. Masse (P2067)
     ?i_item p:P2067 ?stat. 
     ?stat psv:P2067 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
     OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
     ?prop wikibase:directClaim wdt:P2067. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
     BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
   } UNION {
-    # 3. Radius (P2120)
+    # 2. Radius (P2120)
     ?i_item p:P2120 ?stat. 
     ?stat psv:P2120 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
     OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
     ?prop wikibase:directClaim wdt:P2120. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
-    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
-  } UNION {
-    # 4. Rotationsperiode (P2146)
-    ?i_item p:P2146 ?stat. 
-    ?stat psv:P2146 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
-    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
-    ?prop wikibase:directClaim wdt:P2146. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
-    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
-  } UNION {
-    # 5. Durchmesser (P2386)
-    ?i_item p:P2386 ?stat. 
-    ?stat psv:P2386 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
-    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
-    ?prop wikibase:directClaim wdt:P2386. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
-    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
-  } UNION {
-    # 6. Dichte (P2054)
-    ?i_item p:P2054 ?stat. 
-    ?stat psv:P2054 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
-    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
-    ?prop wikibase:directClaim wdt:P2054. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
-    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
-  } UNION {
-    # 7. Fläche (P2046)
-    ?i_item p:P2046 ?stat. 
-    ?stat psv:P2046 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
-    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
-    ?prop wikibase:directClaim wdt:P2046. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
-    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
-  } UNION {
-    # 8. Volumen (P2234)
-    ?i_item p:P2234 ?stat. 
-    ?stat psv:P2234 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
-    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
-    ?prop wikibase:directClaim wdt:P2234. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
-    BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
-  } UNION {
-    # 9. Entfernung Erde (P2582)
-    ?i_item p:P2582 ?stat. 
-    ?stat psv:P2582 [wikibase:quantityAmount ?amt; wikibase:quantityUnit [rdfs:label ?unit]].
-    OPTIONAL { ?stat (pq:P518|pq:P1480) [rdfs:label ?qual]. FILTER(LANG(?qual)="en") }
-    ?prop wikibase:directClaim wdt:P2582. ?prop rdfs:label ?pLabel. FILTER(LANG(?pLabel)="en")
     BIND(IF(BOUND(?qual), CONCAT(?pLabel, " (", ?qual, ")"), ?pLabel) AS ?rn_t_Label)
   }
 
   FILTER(LANG(?unit)="en")
   BIND(CONCAT(STR(?amt), " ", ?unit) AS ?ic_Value)
 
-  # Metadaten (Bilder/Links - einmal pro i_item)
+  # Metadaten (Bilder/Links)
   OPTIONAL { ?i_item wdt:P18 ?ii_item. }
   OPTIONAL { ?iu_item schema:about ?i_item; schema:isPartOf <https://en.wikipedia.org/>. }
 
