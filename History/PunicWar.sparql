@@ -1,11 +1,13 @@
+# Query 1: Connect the main Punic Wars node to the individual wars
+# This builds the first level of the hierarchy: Topic -> Individual Wars
 SELECT
   ?i_start ?i_startLabel ?i_startDescription ?ic_Topic ?ii_startImage ?iu_startUrl
   ?rn_Name (?rn_Name as ?rc_Category)
   ?i_end ?i_endLabel ?i_endDescription ?ic_War ?ii_endImage ?iu_endUrl
 WHERE {
-  # Definiert den zentralen Knoten (Punische Kriege - Q124988)
+  # Define the central node (Punic Wars - Q124988)
   BIND(wd:Q124988 AS ?i_punicwars)
-  # Findet alle Teile (P527) der Punischen Kriege (die einzelnen Kriege)
+  # Find all parts (P527) of the Punic Wars (the individual wars)
   ?i_punicwars wdt:P527 ?i_war.
 
   OPTIONAL { ?i_punicwars wdt:P18 ?ii_punicwarsImage. }
@@ -16,27 +18,27 @@ WHERE {
   BIND(?ii_punicwarsImage AS ?ii_startImage)
   BIND(?ii_warImage AS ?ii_endImage)
   BIND("war" AS ?rn_Name)
-  
-  # Standard-Label-Service für Namen und Beschreibungen in Englisch
+
+  # Standard Label Service for names and descriptions in English
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 2: Beteiligte Parteien / Staaten pro Krieg (participant) + Rom & Karthago fix
+# Query 2: Participating parties and states for each war
 #query
 SELECT
   ?i_start ?i_startLabel ?i_startDescription ?ic_War ?ii_startImage ?iu_startUrl
   ?rn_Name (?rn_Name as ?rc_Category)
   ?i_end ?i_endLabel ?i_endDescription ?ic_Party ?ii_endImage ?iu_endUrl
 WHERE {
-  # Definiert den zentralen Knoten (Punische Kriege - Q124988)
+  # Define the central node (Punic Wars - Q124988)
   BIND(wd:Q124988 AS ?i_punicwars)
-  # Findet alle Teile (P527) der Punischen Kriege (die einzelnen Kriege)
+  # Find all parts (P527) of the Punic Wars (the individual wars)
   ?i_punicwars wdt:P527 ?i_war.
-  # Findet die Teilnehmer (P710) dieser Kriege
+  # Find participants (P710) of these wars
   ?i_war wdt:P710 ?i_party.
 
   OPTIONAL { ?i_war wdt:P18 ?ii_warImage. }
-  # Holt Bilder der beteiligten Staaten
+  # Fetch images of the participating states or entities
   OPTIONAL { ?i_party wdt:P18 ?ii_partyImage. }
 
   BIND(?i_war AS ?i_start)
@@ -44,29 +46,75 @@ WHERE {
   BIND(?ii_warImage AS ?ii_startImage)
   BIND(?ii_partyImage AS ?ii_endImage)
   BIND("participant" AS ?rn_Name)
-  
-  # Standard-Label-Service für Namen und Beschreibungen in Englisch
+
+  # Standard Label Service for names and descriptions in English
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 3: Wichtige Personen (commander of / military commander) pro Krieg
+# Query 3: Biographical data (birth/death) for participating parties as table entries
+#query
+SELECT
+  ?i_start ?i_startLabel ?i_startDescription ?ic_Party ?ii_startImage ?iu_startUrl
+  ?rn_t_Property (?rn_t_Property as ?rc_t_Property)
+  ?ic_BirthDeathYear
+WHERE {
+  # Define the central node (Punic Wars - Q124988)
+  BIND(wd:Q124988 AS ?i_punicwars)
+  # Find all parts (P527) of the Punic Wars (the individual wars)
+  ?i_punicwars wdt:P527 ?i_war.
+  # Find participants (P710) of these wars
+  ?i_war wdt:P710 ?i_party.
+
+  # Fetch images of the participating states or entities
+  OPTIONAL { ?i_party wdt:P18 ?ii_partyImage. }
+
+  # Block 1: Date of birth (P569)
+  {
+    ?i_party wdt:P569 ?date.
+    BIND("born" AS ?rn_t_Property) # rn_t_ displays the value in a property table inside the node
+    BIND(YEAR(?date) AS ?year)   # ic_ uses the column header as the category
+    BIND(IF(?year < 0,
+        CONCAT(STR(ABS(?year)), " BC"),
+        STR(?year))
+      AS ?ic_BirthDeathYear)
+  }
+  UNION
+  # Block 2: Date of death (P570)
+  {
+    ?i_party wdt:P570 ?date.
+    BIND("died" AS ?rn_t_Property)
+    BIND(YEAR(?date) AS ?year)   # ic_ uses the column header as the category
+    BIND(IF(?year < 0,
+        CONCAT(STR(ABS(?year)), " BC"),
+        STR(?year))
+      AS ?ic_BirthDeathYear)
+  }
+
+  BIND(?i_party AS ?i_start)
+  BIND(?ii_partyImage AS ?ii_startImage)
+
+  # Standard Label Service for names and descriptions in English
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+
+# Query 4: Military commanders involved in each war
 #query
 SELECT
   ?i_start ?i_startLabel ?i_startDescription ?ic_War ?ii_startImage ?iu_startUrl
   ?rn_Name (?rn_Name as ?rc_Category)
   ?i_end ?i_endLabel ?i_endDescription ?ic_Commander ?ii_endImage ?iu_endUrl
 WHERE {
-  # Definiert den zentralen Knoten (Punische Kriege - Q124988)
+  # Define the central node (Punic Wars - Q124988)
   BIND(wd:Q124988 AS ?i_punicwars)
-  # Findet alle Teile (P527) der Punischen Kriege (die einzelnen Kriege)
+  # Find all parts (P527) of the Punic Wars (the individual wars)
   ?i_punicwars wdt:P527 ?i_war.
-  # Findet Personen, deren Konflikt (P607) einer der Punischen Kriege war
+  # Find people whose conflict (P607) was one of the Punic Wars
   ?i_person wdt:P607 ?i_war.
-  # Filtert nach Personen, die Kommandanten (P598) waren oder eine militärische Position (P410) innehatten
+  # Filter for people who were commanders (P598) or held a military rank/position (P410)
   ?i_person wdt:P598|wdt:P410 ?anyrole.
 
   OPTIONAL { ?i_war wdt:P18 ?ii_warImage. }
-  # Holt Porträts der Kommandanten
+  # Fetch portraits of the commanders
   OPTIONAL { ?i_person wdt:P18 ?ii_personImage. }
 
   BIND(?i_war AS ?i_start)
@@ -74,29 +122,76 @@ WHERE {
   BIND(?ii_warImage AS ?ii_startImage)
   BIND(?ii_personImage AS ?ii_endImage)
   BIND("military commander" AS ?rn_Name)
-  
-  # Standard-Label-Service für Namen und Beschreibungen in Englisch
+
+  # Standard Label Service for names and descriptions in English
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 4: Wichtige Schlachten / militärische Konflikte pro Krieg
+# Query 5: Biographical data (birth/death) for commanders as table entries
+#query
+SELECT
+  ?i_start ?i_startLabel ?i_startDescription ?ic_Commander ?ii_startImage ?iu_startUrl
+  ?rn_t_Property (?rn_t_Property as ?rc_t_Property)
+  ?ic_BirthDeathYear
+WHERE {
+  # Define the central node (Punic Wars - Q124988)
+  BIND(wd:Q124988 AS ?i_punicwars)
+  # Find all parts (P527) of the Punic Wars (the individual wars)
+  ?i_punicwars wdt:P527 ?i_war.
+  # Find people whose conflict (P607) was one of the Punic Wars
+  ?i_person wdt:P607 ?i_war.
+  # Filter for people who were commanders (P598) or held a military rank/position (P410)
+  ?i_person wdt:P598|wdt:P410 ?anyrole.
+
+  # Fetch portraits of the commanders
+  OPTIONAL { ?i_person wdt:P18 ?ii_personImage. }
+
+  # Block 1: Date of birth (P569)
+  {
+    ?i_person wdt:P569 ?date.
+    BIND("born" AS ?rn_t_Property) # rn_t_ displays the value in a table within the node
+    BIND(YEAR(?date) AS ?year)   # ic_ uses the column header as the category
+    BIND(IF(?year < 0,
+        CONCAT(STR(ABS(?year)), " BC"),
+        STR(?year))
+      AS ?ic_BirthDeathYear)
+  }
+  UNION
+  # Block 2: Date of death (P570)
+  {
+    ?i_person wdt:P570 ?date.
+    BIND("died" AS ?rn_t_Property)
+    BIND(YEAR(?date) AS ?year)   # ic_ uses the column header as the category
+    BIND(IF(?year < 0,
+        CONCAT(STR(ABS(?year)), " BC"),
+        STR(?year))
+      AS ?ic_BirthDeathYear)
+  }
+
+  BIND(?i_person AS ?i_start)
+  BIND(?ii_personImage AS ?ii_startImage)
+
+  # Standard Label Service for names and descriptions in English
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+
+# Query 6: Significant battles and military conflicts per war
 #query
 SELECT
   ?i_start ?i_startLabel ?i_startDescription ?ic_War ?ii_startImage ?iu_startUrl
   ?rn_Name (?rn_Name as ?rc_Category)
   ?i_end ?i_endLabel ?i_endDescription ?ic_Battle ?ii_endImage ?iu_endUrl
 WHERE {
-  # Definiert den zentralen Knoten (Punische Kriege - Q124988)
+  # Define the central node (Punic Wars - Q124988)
   BIND(wd:Q124988 AS ?i_punicwars)
-  # Findet alle Teile (P527) der Punischen Kriege (die einzelnen Kriege)
+  # Find all parts (P527) of the Punic Wars (the individual wars)
   ?i_punicwars wdt:P527 ?i_war.
-  # Findet Ereignisse, die Teil des Konflikts (P361) waren und...
-  # ...Instanzen von (P31) oder Unterklassen von (P279*) Schlachten (Q178561) sind
+  # Find events that were part of (P361) the war and are instances of (P31) or subclasses of (P279*) battle (Q178561)
   ?i_battle wdt:P361 ?i_war;
     wdt:P31/wdt:P279* wd:Q178561.
 
   OPTIONAL { ?i_war wdt:P18 ?ii_warImage. }
-  # Holt Bilder der Schlachtfelder oder Darstellungen
+  # Fetch images of the battlefields or historical depictions
   OPTIONAL { ?i_battle wdt:P18 ?ii_battleImage. }
 
   BIND(?i_war AS ?i_start)
@@ -104,156 +199,65 @@ WHERE {
   BIND(?ii_warImage AS ?ii_startImage)
   BIND(?ii_battleImage AS ?ii_endImage)
   BIND("battle" AS ?rn_Name)
-  
-  # Standard-Label-Service für Namen und Beschreibungen in Englisch
+
+  # Standard Label Service for names and descriptions in English
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 5: Zeitliche & Ergebnis-Properties als innere Tabelle (rn_t_)
+# Query 7: Chronological properties (start/end/point in time) for battles as table entries
 #query
 SELECT
   ?i_start ?i_startLabel ?i_startDescription ?ic_Battle ?ii_startImage ?iu_startUrl
   ?rn_t_Property (?rn_t_Property as ?rc_t_Property)
   ?ic_Year
 WHERE {
-  # Definiert den zentralen Knoten (Punische Kriege - Q124988)
+  # Define the central node (Punic Wars - Q124988)
   BIND(wd:Q124988 AS ?i_punicwars)
-  # Findet alle Teile (P527) der Punischen Kriege (die einzelnen Kriege)
+  # Find all parts (P527) of the Punic Wars (the individual wars)
   ?i_punicwars wdt:P527 ?i_war.
-  # Findet Ereignisse, die Teil des Konflikts (P361) waren und...
-  # ...Instanzen von (P31) oder Unterklassen von (P279*) Schlachten (Q178561) sind
+  # Find events that were part of (P361) the war and are instances of (P31) or subclasses of (P279*) battle (Q178561)
   ?i_battle wdt:P361 ?i_war;
     wdt:P31/wdt:P279* wd:Q178561.
 
-    # Block 1: Startzeitpunkt (P580)
-    {
-        ?i_battle wdt:P580 ?date.
-        BIND("start year" AS ?rn_t_Property) # rn_t_ zeigt den Wert in einer Tabelle im Knoten an
-        BIND(YEAR(?date) AS ?year)   # ic_ nutzt den Spaltennamen als Kategorie
-        BIND(IF(?year < 0, 
-                CONCAT(STR(ABS(?year)), " BC"), 
-                STR(?year)) 
-            AS ?ic_Year)        
-    }
-    UNION
-    # Block 2: Endzeitpunkt (P582)
-    {
-        ?i_battle wdt:P582 ?date.
-        BIND("end year" AS ?rn_t_Property)
-        BIND(YEAR(?date) AS ?year)   # ic_ nutzt den Spaltennamen als Kategorie
-        BIND(IF(?year < 0, 
-                CONCAT(STR(ABS(?year)), " BC"), 
-                STR(?year)) 
-            AS ?ic_Year)        
-    }
-    UNION
-    # Block 3: Zeitpunkt (P585)
-    {
-        ?i_battle wdt:P585 ?date.
-        BIND("year" AS ?rn_t_Property)
-        BIND(YEAR(?date) AS ?year)   # ic_ nutzt den Spaltennamen als Kategorie
-        BIND(IF(?year < 0, 
-                CONCAT(STR(ABS(?year)), " BC"), 
-                STR(?year)) 
-            AS ?ic_Year)        
-    }
+  # Block 1: Start time (P580)
+  {
+    ?i_battle wdt:P580 ?date.
+    BIND("start year" AS ?rn_t_Property) # rn_t_ displays the value in a property table
+    BIND(YEAR(?date) AS ?year)   # ic_ uses the column header as the category
+    BIND(IF(?year < 0,
+        CONCAT(STR(ABS(?year)), " BC"),
+        STR(?year))
+      AS ?ic_Year)
+  }
+  UNION
+  # Block 2: End time (P582)
+  {
+    ?i_battle wdt:P582 ?date.
+    BIND("end year" AS ?rn_t_Property)
+    BIND(YEAR(?date) AS ?year)
+    BIND(IF(?year < 0,
+        CONCAT(STR(ABS(?year)), " BC"),
+        STR(?year))
+      AS ?ic_Year)
+  }
+  UNION
+  # Block 3: Point in time (P585)
+  {
+    ?i_battle wdt:P585 ?date.
+    BIND("year" AS ?rn_t_Property)
+    BIND(YEAR(?date) AS ?year)
+    BIND(IF(?year < 0,
+        CONCAT(STR(ABS(?year)), " BC"),
+        STR(?year))
+      AS ?ic_Year)
+  }
 
-  # Holt Bilder der Schlachtfelder oder Darstellungen
+  # Fetch images of the battlefields or historical depictions
   OPTIONAL { ?i_battle wdt:P18 ?ii_battleImage. }
 
   BIND(?i_battle AS ?i_start)
   BIND(?ii_battleImage AS ?ii_startImage)
-  
-  # Standard-Label-Service für Namen und Beschreibungen in Englisch
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#query
-# Query 1 (Set 2): Hauptstruktur - Kriege, Schlachten und Kommandanten (Alternative Sicht)
-SELECT 
-  ?i_war ?i_warLabel ?i_warDescription ?ii_war
-  ?rn_rel1 (?rn_rel1 as ?rc_rel1)
-  ?i_battle ?i_battleLabel ?i_battleDescription ?ii_battle
-  ?rn_rel2 (?rn_rel2 as ?rc_rel2)
-  ?i_commander ?i_commanderLabel ?i_commanderDescription ?ii_commander
-WHERE {
-  # Startpunkt: Die drei Punischen Kriege (andere IDs, teils Duplikate zur Konsolidierung)
-  VALUES ?i_war { wd:Q6286 wd:Q6271 wd:Q6334 } 
-  
-  # Findet Schlachten (Q178561), die Teil (P361) dieser Kriege sind
-  ?i_battle wdt:P31 wd:Q178561; 
-            wdt:P361 ?i_war.    
-  
-  # Verknüpft Kommandanten (P1612) optional mit den Schlachten
-  OPTIONAL { 
-    ?i_battle wdt:P1612 ?i_commander. 
-    BIND("commander" AS ?rn_rel2)
-  }
-  
-  # Definiert die Verbindung zwischen Krieg und Schlacht
-  BIND("battle of" AS ?rn_rel1)
-  
-  # Metadaten für Bilder
-  OPTIONAL { ?i_war wdt:P18 ?ii_war. }
-  OPTIONAL { ?i_battle wdt:P18 ?ii_battle. }
-
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-}
-
-#query
-# Query 2 (Set 2): Details und Tabellen-Relationen (Militärische Stärke und Orte)
-SELECT 
-  ?i_item ?i_itemLabel ?i_itemDescription ?ii_item ?iu_item
-  ?rn_t_Label (?rn_t_Label as ?rc_Label) ?ic_Value
-WHERE {
-  # Fokus auf spezifische Schlachten und historische Persönlichkeiten
-  VALUES ?i_item { 
-    wd:Q6271 wd:Q6286 wd:Q6334 # Die Kriege
-    wd:Q12468 wd:Q2253 wd:Q161077 # Hannibal, Scipio, Hasdrubal
-    wd:Q62263 wd:Q179592 wd:Q185969 # Cannae, Zama, Trebia
-  }
-
-  {
-    # 1. Zeitpunkt (P585) als Tabelleneintrag
-    ?i_item wdt:P585 ?date.
-    BIND("Date" AS ?rn_t_Label)
-    BIND(STR(?date) AS ?ic_Value)
-  } UNION {
-    # 2. Geografischer Ort (P625) mit Koordinaten-Extraktion
-    ?i_item wdt:P625 ?coords.
-    ?i_item p:P625/psv:P625 [
-      wikibase:geoLatitude ?lat;
-      wikibase:geoLongitude ?long
-    ].
-    BIND("Location" AS ?rn_t_Label)
-    # Erzeugt einen Google Maps Link (iu_ zeigt auf externe URL, §if steuert IKBB-Verhalten)
-    BIND(CONCAT("http://maps.google.com/maps?q=", STR(?lat), ",", STR(?long), "§if") AS ?iu_item)
-    BIND("Open in Maps" AS ?ic_Value)
-  } UNION {
-    # 3. Teilnehmer (P710) als Tabelleneintrag (ic_Value zeigt den Namen im Tabellenfeld)
-    ?i_item wdt:P710 ?participant.
-    ?participant rdfs:label ?ic_Value.
-    FILTER(LANG(?ic_Value) = "en")
-    BIND("Participant" AS ?rn_t_Label)
-  }
-
-  # Zusätzliche Metadaten (Bilder und Wikipedia-Links)
-  OPTIONAL { ?i_item wdt:P18 ?ii_item. }
-  OPTIONAL { ?iu_item schema:about ?i_item; schema:isPartOf <https://en.wikipedia.org/>. }
-
+  # Standard Label Service for names and descriptions in English
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
