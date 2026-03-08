@@ -363,6 +363,38 @@ WHERE {
 ORDER BY ?propertyLabel
 ```
 
+### 15.8. Identifying Important Backward Relationships
+This advanced version of the backward relationship query filters results to show only "important" items (those with at least 5 referrers on WikiData) and sorts them by importance. This helps in filtering out noise when exploring connections.
+
+```sparql
+SELECT ?itemLabel ?propertyLabel ?item ?property (COUNT(?referrer) AS ?importance)
+WHERE {
+  # 1. Connect item to Einstein (wd:Q937)
+  ?item ?directProp wd:Q937.
+  
+  # 2. Map to the actual Property entity for the label
+  ?property wikibase:directClaim ?directProp .
+
+  # 3. Count referrers: Only allow direct properties (wdt:) 
+  # and ensure the referrer is a standard Item (Q)
+  ?referrer ?anyDirectProp ?item .
+  FILTER(STRSTARTS(STR(?anyDirectProp), "http://www.wikidata.org/prop/direct/"))
+  FILTER(STRSTARTS(STR(?referrer), "http://www.wikidata.org/entity/Q"))
+
+  # 4. Filter the target item to be a standard Q-item
+  FILTER(STRSTARTS(STR(?item), "http://www.wikidata.org/entity/Q"))
+
+  SERVICE wikibase:label { 
+    bd:serviceParam wikibase:language "de,en". 
+  }
+}
+GROUP BY ?item ?itemLabel ?property ?propertyLabel
+# Filter out items with less than 5 referrers
+HAVING (COUNT(?referrer) >= 5)
+# Sort by property name, then by importance
+ORDER BY ?propertyLabel DESC(?importance)
+```
+
 ---
 
 ## 16. Tips
