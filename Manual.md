@@ -338,6 +338,31 @@ Use `VALUES` to define a fixed item as a starting point.
 VALUES (?item) {(wd:Q138809)}
 ```
 
+### 15.7. Identifying Backward Relationships
+Use this snippet to find out which properties connect other items to a specific central item (e.g., Albert Einstein). This is useful for identifying "incoming" connections that you might want to include in your map.
+
+```sparql
+SELECT ?itemLabel ?propertyLabel ?item ?property
+WHERE {
+  # Connects the item (?item) to Albert Einstein (wd:Q937) via any direct predicate (?directProp)
+  ?item ?directProp wd:Q937.
+  
+  # Maps the technical URI (prop/direct/P...) to the actual Property entity (entity/P...)
+  # This step is crucial for the Label Service to find the human-readable name.
+  ?property wikibase:directClaim ?directProp .
+
+  # Ensures that only standard Wikidata items (starting with Q) are returned, 
+  # filtering out internal statement nodes or references.
+  FILTER(STRSTARTS(STR(?item), "http://www.wikidata.org/entity/Q"))
+
+  # Label Service for fetching names in German, falling back to English
+  SERVICE wikibase:label { 
+    bd:serviceParam wikibase:language "de,en". 
+  }
+}
+ORDER BY ?propertyLabel
+```
+
 ---
 
 ## 16. Tips

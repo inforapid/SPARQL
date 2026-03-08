@@ -159,7 +159,62 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 7: Military commanders involved in each constituent part
+# Query 7: Chronological properties (start/end/point in time) for battles as table entries
+# This adds properties to the Battle nodes
+#query
+SELECT
+  ?i_start ?i_startLabel ?i_startDescription ?ic_Battle ?ii_startImage ?iu_startUrl
+  ?rn_t_Property (?rn_t_Property as ?rc_t_Property)
+  ?ic_Date
+WHERE {
+  # Define the central node (American Civil War - Q8676)
+  BIND(wd:Q8676 AS ?i_civilwar)
+  # Find all constituent parts (P527)
+  ?i_civilwar wdt:P527 ?i_war.
+  # Find events that were part of (P361) these constituent parts
+  ?i_battle wdt:P361 ?i_war.
+
+  # Block 1: Start time (P580)
+  {
+    ?i_battle wdt:P580 ?date.
+    BIND("start date" AS ?rn_t_Property) # rn_t_ displays the value in a property table
+    BIND(MONTH(?date) AS ?m)
+    BIND(DAY(?date) AS ?d)
+    BIND(YEAR(?date) AS ?y)
+    BIND(CONCAT(STR(?m), "/", STR(?d), "/", STR(?y)) AS ?ic_Date)    
+  }
+  UNION
+  # Block 2: End time (P582)
+  {
+    ?i_battle wdt:P582 ?date.
+    BIND("end date" AS ?rn_t_Property)
+    BIND(MONTH(?date) AS ?m)
+    BIND(DAY(?date) AS ?d)
+    BIND(YEAR(?date) AS ?y)
+    BIND(CONCAT(STR(?m), "/", STR(?d), "/", STR(?y)) AS ?ic_Date)    
+  }
+  UNION
+  # Block 3: Point in time (P585)
+  {
+    ?i_battle wdt:P585 ?date.
+    BIND("date" AS ?rn_t_Property)
+    BIND(MONTH(?date) AS ?m)
+    BIND(DAY(?date) AS ?d)
+    BIND(YEAR(?date) AS ?y)
+    BIND(CONCAT(STR(?m), "/", STR(?d), "/", STR(?y)) AS ?ic_Date)    
+  }
+
+  # Fetch images of the battlefields or historical depictions
+  OPTIONAL { ?i_battle wdt:P18 ?ii_battleImage. }
+
+  BIND(?i_battle AS ?i_start)
+  BIND(?ii_battleImage AS ?ii_startImage)
+
+  # Standard Label Service for names and descriptions in English
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+
+# Query 8: Military commanders involved in each constituent part
 # This builds the hierarchy: Constituent Part -> Commanders
 #query
 SELECT
@@ -190,7 +245,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 8: Allegiance of military commanders involved in constituent parts
+# Query 9: Allegiance of military commanders involved in constituent parts
 # This builds the hierarchy: Commander -> Allegiance (State/Entity)
 #query
 SELECT
@@ -222,7 +277,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 9: Military commanders involved in specific battles
+# Query 10: Military commanders involved in specific battles
 # This builds the hierarchy: Battle -> Commanders
 #query
 SELECT
@@ -254,7 +309,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 
-# Query 10: Allegiance of military commanders involved in specific battles
+# Query 11: Allegiance of military commanders involved in specific battles
 # This builds the hierarchy: Commander -> Allegiance (State/Entity)
 #query
 SELECT
