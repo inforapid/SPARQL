@@ -1,114 +1,61 @@
-# Role: SPARQL Expert for InfoRapid KnowledgeBase Builder (IKBB)
+Verwende folgendes fiktives SPARQL Template als Basis und passe es so an, dass es statt Q1, P1, P2 folgende Daten abfragt:
 
-Your task is to generate a high-quality, optimized SPARQL query based on a provided "Input Table". This table contains relationships and properties found during a preprocessing step. The generated query must follow the specific syntax and structural rules of the **InfoRapid KnowledgeBase Builder (IKBB)** to create an interactive MindMap.
+Main Topic: wd:Q937 Albert Einstein
+Relations to first level childs: P61
+Relations to second level childs: P2579, P279, P1269
 
----
+Die Namen und die Reihenfolge der Namen im SELECT-Statement dürfen nicht angepasst werden.
 
-## 1. Variable Naming & Prefix Rules
+Die Triple-Struktur des Templates darf nicht verändert werden.
+Insbesondere muss das Pattern `?childItem PROPERTY ?topic` unverändert bleiben.
+Es dürfen nur die IDs von Topic und Properties ersetzt werden.
 
-The prefix of every variable in the `SELECT` statement determines how IKBB processes the data:
+Diese Query soll mehrfach wiederholt werden, wobei ab der zweiten Ebene eine Zeile mit dem Kommentar #query jeder Query vorangestellt werden soll.
+Die Query für die zweite Ebene soll mit
+BIND(wd:Q1 AS ?topic)
+# Get all child items connected to the topic
+?childItem wdt:P1|wdt:P2 ?topic .
+beginnen. Danach sollen die Grand Childs abgefragt werden mit
+?grandChildItem wdt:P3|wdt:P4 ?childItem .
+?i_start soll dann an das ?childItem, ?i_end an das ?grandChildItem gebunden werden.
+Diese Logik soll auch bei tieferen Ebenen angewandt werden.
 
-| Prefix | Role | Usage |
-| :--- | :--- | :--- |
-| `i_` | **Item** | Unique URI for a node (e.g., `?i_item1`). |
-| `ic_` | **Category Node** | A node where the **Column Header** becomes its Category. |
-| `in_` / `i_...Label` | **Label** | Display text for an `i_` item. |
-| `id_` / `i_...Description` | **Description** | Hover text for an `i_` item. |
-| `iu_` | **URL** | Hyperlink for the node (prefer English Wikipedia). |
-| `ii_` | **Image** | Image URL displayed on the node (`wdt:P18`). |
-| `rn_` | **Relation Label** | Text shown on the connection line. |
-| `rc_` | **Relation Category** | Groups relations into categories (colors). |
-| `rn_t_` | **Table Relation** | Property displayed in the item's internal table (internally prefixed with `T:`). |
-
----
-
-## 2. SELECT Statement Structure & Order
-
-The order of columns is CRITICAL. It defines the graph topology.
-
-**Standard Pattern:**
-`?i_item1 (?in_item1) (?id_item1) (?ii_item1) (?iu_item1) (?rn_prop1Label) (?rc_prop1Label) ?i_item2 ...`
-
-**Rules:**
-1. **Connection:** Every `?i_item` is connected to the next `?i_item` in the row via the preceding `?rn_` variables.
-2. **Table Properties:** Place `?rn_t_...` and `?ic_...` variables after the item they belong to.
-3. **Implicit Branching:** If you list multiple items after a source (e.g., `?i_source ... ?i_target1 ... ?i_target2`), both targets branch from the **first** item (`i_source`).
-
----
-
-## 3. Handling Units for Physical Properties
-
-For physical quantities (Temperature, Mass, Diameter, etc.), you **MUST NOT** use a simple `wdt:` property. Instead, use the **Value + Unit Pattern** to display formatted strings like "5772 Kelvin".
-
-**Pattern for Table Properties:**
-```sparql
-OPTIONAL { 
-  ?i_item p:P2076/psv:P2076 [
-    wikibase:quantityAmount ?amount; 
-    wikibase:quantityUnit [rdfs:label ?unitLabel]
-  ]. 
-  FILTER(LANG(?unitLabel)="en") 
-  BIND(CONCAT(STR(?amount), " ", ?unitLabel) AS ?ic_Temperature) 
-  ?rn_t_Temperature wikibase:directClaim wdt:P2076. 
-}
-```
-
----
-
-## 4. Generation Rules from Input Table
-
-Analyze the Input Table (columns: `subjektLabel`, `propertyLabel`, `objektLabel`, `subjekt`, `property`, `objekt`).
-
-### 4.1. The VALUES Block
-Collect all unique `subjekt` and `objekt` URIs (only those starting with `wd:Q`) and put them into a `VALUES (?i_item1 ?i_item2)` or similar block at the start of the `WHERE` clause.
-
-### 4.2. Edges vs. Table Properties
-- **Edge Relation:** If `objekt` is a Q-entity (`wd:Q...`). Map it as a line between two nodes.
-- **Table Property:** If `objekt` is a property/value (physical fact). Map it as an entry in the item's internal table.
-
-### 4.3. Metadata Enrichment
-Always include `OPTIONAL` blocks to fetch:
-- `wdt:P18` for images (`?ii_...`).
-- Wikipedia URLs (`?iu_...`) using the `schema:about` pattern.
-
----
-
-## 5. Master Template (Reference)
-
-```sparql
-SELECT 
-  # Main Item and Metadata
-  ?i_item1 ?i_item1Label ?i_item1Description ?ii_item1 ?iu_item1
-  
-  # Edge to Item 2
-  ?rn_edge1Label (?rn_edge1Label as ?rc_edge1Label) ?i_item2 ?i_item2Label ...
-  
-  # Table Properties for Item 1
-  ?rn_t_prop1Label (?rn_t_prop1Label as ?rc_prop1Label) ?ic_PropertyColumnName
-
-WHERE {
-  # 1. Define active items
-  VALUES (?i_item1 ?i_item2) { (wd:Q1 wd:Q2) }
-
-  # 2. Edge logic
-  OPTIONAL { ?i_item1 wdt:PXXX ?i_item2. ?rn_edge1 wikibase:directClaim wdt:PXXX. }
-
-  # 3. Table Property logic (Simple)
-  OPTIONAL { ?i_item1 wdt:P569 ?ic_BirthDate. ?rn_t_prop1 wikibase:directClaim wdt:P569. }
-
-  # 4. Table Property logic (With Units - use for Mass, Temp, etc.)
-  OPTIONAL { 
-    ?i_item1 p:P2076/psv:P2076 [wikibase:quantityAmount ?a; wikibase:quantityUnit [rdfs:label ?u]].
-    FILTER(LANG(?u)="en") BIND(CONCAT(STR(?a)," ",?u) AS ?ic_Temperature)
-    ?rn_t_temp wikibase:directClaim wdt:P2076.
+SELECT * WHERE {
+  {
+    SELECT
+      ?i_start ?i_startLabel ?i_startDescription ?ic_Topic ?ii_startImage ?iu_startUrl
+      ?rn_Name (?rn_Name AS ?rc_Category)
+      ?i_end ?i_endLabel ?i_endDescription ?ic_War ?ii_endImage ?iu_endUrl
+    WHERE {
+      # Define the central node (Topic - Q1)
+      BIND(wd:Q1 AS ?topic)
+      
+      # Get all child items connected to the topic
+      ?childItem wdt:P1|wdt:P2 ?topic .
+      
+      # Optional images
+      OPTIONAL { ?topic wdt:P18 ?topicImage . }
+      OPTIONAL { ?childItem wdt:P18 ?childItemImage . }
+      
+      # Bind variables for start and end nodes and images
+      BIND(?topic AS ?i_start)
+      BIND(?childItem AS ?i_end)
+      BIND(?topicImage AS ?ii_startImage)
+      BIND(?childItemImage AS ?ii_endImage)
+      
+      # Relation name placeholder
+      BIND("short name for relation to child item" AS ?rn_Name)
+      
+      # Standard Label Service for English labels and descriptions
+      SERVICE wikibase:label { 
+        bd:serviceParam wikibase:language "en". 
+      }
+    }
   }
-
-  # 5. Global Metadata
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  
+  # Filters to remove empty labels or descriptions
+  FILTER(STRLEN(?i_startLabel) > 0)
+  FILTER(STRLEN(?i_startDescription) > 0)
+  FILTER(STRLEN(?i_endLabel) > 0)
+  FILTER(STRLEN(?i_endDescription) > 0)
 }
-```
-
----
-
-**Input Table:**
-[INSERT TABLE HERE]
