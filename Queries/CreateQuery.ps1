@@ -1,6 +1,17 @@
 # PowerShell Skript: Erzeugt queries.sparql (Level 1 bis Level 3)
 
 $outputFile = "queries.sparql"
+# STEUERUNG: $true = Bilder sind optional, $false = Bilder sind Pflicht (Query liefert nur Ergebnisse mit Bildern)
+$imagesOptional = $true 
+
+if ($imagesOptional) {
+    $optPrefix = "OPTIONAL { "
+    $optSuffix = " }"
+} else {
+    $optPrefix = ""
+    $optSuffix = ""
+}
+
 Set-Content -Path $outputFile -Value "" -Encoding UTF8
 
 # Definitionen
@@ -16,10 +27,9 @@ $level2Properties = @(
     @{ prop = "P1269"; shortName = "influences"; icVar = "ic_Influencer" }
 )
 
-# Neue Properties für Level 3 (Beispiele)
 $level3Properties = @(
     @{ prop = "P31";   shortName = "instance of"; icVar = "ic_Type" },
-    @{ prop = "P361";  shortName = "part of";     icVar = "ic_Parent" },
+    @{ prop = "P361";  shortName = "part of";      icVar = "ic_Parent" },
     @{ prop = "P1343"; shortName = "described in"; icVar = "ic_Literature" }
 )
 
@@ -30,13 +40,13 @@ $level1Template = @"
 SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl
-           ?rn_Name (?rn_Name AS ?rc_Category)
-           ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
+            ?rn_Name (?rn_Name AS ?rc_Category)
+            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
       ?childItem wdt:{3} ?topic .
-      OPTIONAL {{ ?topic wdt:P18 ?topicImage . }}
-      OPTIONAL {{ ?childItem wdt:P18 ?childItemImage . }}
+      {5} ?topic wdt:P18 ?topicImage . {6}
+      {5} ?childItem wdt:P18 ?childItemImage . {6}
       BIND(?topic AS ?i_start)
       BIND(?childItem AS ?i_end)
       BIND(?topicImage AS ?ii_startImage)
@@ -57,14 +67,14 @@ $level2Template = @"
 SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl
-           ?rn_Name (?rn_Name AS ?rc_Category)
-           ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
+            ?rn_Name (?rn_Name AS ?rc_Category)
+            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
       ?childItem wdt:{3} ?topic .
       ?grandChildItem wdt:{4} ?childItem .
-      OPTIONAL {{ ?childItem wdt:P18 ?childItemImage . }}
-      OPTIONAL {{ ?grandChildItem wdt:P18 ?grandChildItemImage . }}
+      {6} ?childItem wdt:P18 ?childItemImage . {7}
+      {6} ?grandChildItem wdt:P18 ?grandChildItemImage . {7}
       BIND(?childItem AS ?i_start)
       BIND(?grandChildItem AS ?i_end)
       BIND(?childItemImage AS ?ii_startImage)
@@ -85,16 +95,16 @@ $level3Template = @"
 SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl
-           ?rn_Name (?rn_Name AS ?rc_Category)
-           ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
+            ?rn_Name (?rn_Name AS ?rc_Category)
+            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
       ?childItem wdt:{3} ?topic .
       ?grandChildItem wdt:{4} ?childItem .
       ?greatGrandChildItem wdt:{5} ?grandChildItem .
       
-      OPTIONAL {{ ?grandChildItem wdt:P18 ?gcImage . }}
-      OPTIONAL {{ ?greatGrandChildItem wdt:P18 ?ggcImage . }}
+      {7} ?grandChildItem wdt:P18 ?gcImage . {8}
+      {7} ?greatGrandChildItem wdt:P18 ?ggcImage . {8}
       
       BIND(?grandChildItem AS ?i_start)
       BIND(?greatGrandChildItem AS ?i_end)
@@ -116,7 +126,7 @@ SELECT * WHERE {{
 # Level 1
 foreach ($p1 in $level1Properties) {
     if ($level0.icVar -ne $p1.icVar) {
-        $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $p1.prop, $p1.shortName
+        $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $p1.prop, $p1.shortName, $optPrefix, $optSuffix
         Add-Content -Path $outputFile -Value $query -Encoding UTF8
     }
 }
@@ -125,7 +135,7 @@ foreach ($p1 in $level1Properties) {
 foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
         if ($p1.icVar -ne $p2.icVar) {
-            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $p1.prop, $p2.prop, $p2.shortName
+            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $p1.prop, $p2.prop, $p2.shortName, $optPrefix, $optSuffix
             Add-Content -Path $outputFile -Value $query -Encoding UTF8
         }
         else {
@@ -138,9 +148,8 @@ foreach ($p1 in $level1Properties) {
 foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
         foreach ($p3 in $level3Properties) {
-            # Hier prüfen wir, ob das Start-Item (Level 2) gleich dem End-Item (Level 3) ist
             if ($p2.icVar -ne $p3.icVar) {
-                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $p1.prop, $p2.prop, $p3.prop, $p3.shortName
+                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $p1.prop, $p2.prop, $p3.prop, $p3.shortName, $optPrefix, $optSuffix
                 Add-Content -Path $outputFile -Value $query -Encoding UTF8
             }
             else {
@@ -150,4 +159,4 @@ foreach ($p1 in $level1Properties) {
     }
 }
 
-Write-Host "Erfolgreich Queries für 3 Ebenen generiert."
+Write-Host "Erfolgreich Queries (Bilder optional: $imagesOptional) generiert."
