@@ -18,6 +18,7 @@ BIND(wd:Q1 AS ?topic)
 beginnen. Danach sollen die Grand Childs abgefragt werden mit
 ?grandChildItem wdt:P3|wdt:P4 ?childItem .
 ?i_start soll dann an das ?childItem, ?i_end an das ?grandChildItem gebunden werden.
+Variablen für Item-Kategorien ?ic_Level1 und ?ic_Level2 sollen im SELECT-Statement direkt benannt werden (z. B. `?ic_Concept`), es soll wirklich der Variablennamen angepasst werden, es soll kein BIND der Variable auf Textwerte erfolgen. Die Namen der Item-Kategorie-Variablen sollen repräsentativ für die Items sein. Für Start-Items: eine Kategorie, die das Item gut beschreibt (z. B. "Physicist", "Topic", "Organization" …). Für End-Items: eine Kategorie, die das Item gut beschreibt (z. B. "Theory", "Publication", "Event" …). Die Kategorien sollen kurz und prägnant sein. Also z.B. bei der ersten Query die Variablennamen ?ic_Level1 durch ?ic_Physicist und ?ic_Level2 durch ?ic_Theory ersetzen. Wichtig: in der zweiten Query muss dann ?ic_Level1 ebenfalls durch ?ic_Theory ersetzt werden, damit gleiche items in der gleichen Kategory liegen.
 Diese Logik soll auch bei tieferen Ebenen angewandt werden.
 
 Die erstellten Queries werden zwar voneinander unabhängig ausgeführt, sie sollen aber in einer Textbox zusammen ausgegeben werden, nicht einzeln, damit sie auf einmal kopiert werden können.
@@ -27,9 +28,9 @@ Die erstellten Queries werden zwar voneinander unabhängig ausgeführt, sie soll
 SELECT * WHERE {
   {
     SELECT
-      ?i_start ?i_startLabel ?i_startDescription ?ic_Topic ?ii_startImage ?iu_startUrl
+      ?i_start ?i_startLabel ?i_startDescription ?ic_Level1 ?ii_startImage ?iu_startUrl
       ?rn_Name (?rn_Name AS ?rc_Category)
-      ?i_end ?i_endLabel ?i_endDescription ?ic_War ?ii_endImage ?iu_endUrl
+      ?i_end ?i_endLabel ?i_endDescription ?ic_Level2 ?ii_endImage ?iu_endUrl
     WHERE {
       # Define the central node (Topic - Q1)
       BIND(wd:Q1 AS ?topic)
