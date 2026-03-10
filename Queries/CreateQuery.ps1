@@ -115,15 +115,22 @@ SELECT * WHERE {{
 
 # Level 1
 foreach ($p1 in $level1Properties) {
-    $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $p1.prop, $p1.shortName
-    Add-Content -Path $outputFile -Value $query -Encoding UTF8
+    if ($level0.icVar -ne $p1.icVar) {
+        $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $p1.prop, $p1.shortName
+        Add-Content -Path $outputFile -Value $query -Encoding UTF8
+    }
 }
 
 # Level 2
 foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
-        $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $p1.prop, $p2.prop, $p2.shortName
-        Add-Content -Path $outputFile -Value $query -Encoding UTF8
+        if ($p1.icVar -ne $p2.icVar) {
+            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $p1.prop, $p2.prop, $p2.shortName
+            Add-Content -Path $outputFile -Value $query -Encoding UTF8
+        }
+        else {
+            Write-Host "Überspringe Level 2 Query: $($p1.icVar) ist identisch mit $($p2.icVar)" -ForegroundColor Yellow
+        }
     }
 }
 
@@ -131,8 +138,14 @@ foreach ($p1 in $level1Properties) {
 foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
         foreach ($p3 in $level3Properties) {
-            $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $p1.prop, $p2.prop, $p3.prop, $p3.shortName
-            Add-Content -Path $outputFile -Value $query -Encoding UTF8
+            # Hier prüfen wir, ob das Start-Item (Level 2) gleich dem End-Item (Level 3) ist
+            if ($p2.icVar -ne $p3.icVar) {
+                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $p1.prop, $p2.prop, $p3.prop, $p3.shortName
+                Add-Content -Path $outputFile -Value $query -Encoding UTF8
+            }
+            else {
+                Write-Host "Überspringe Level 3 Query: $($p2.icVar) ist identisch mit $($p3.icVar)" -ForegroundColor Yellow
+            }
         }
     }
 }
