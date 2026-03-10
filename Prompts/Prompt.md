@@ -20,6 +20,10 @@ beginnen. Danach sollen die Grand Childs abgefragt werden mit
 ?i_start soll dann an das ?childItem, ?i_end an das ?grandChildItem gebunden werden.
 Diese Logik soll auch bei tieferen Ebenen angewandt werden.
 
+Die erstellten Queries werden zwar voneinander unabhängig ausgeführt, sie sollen aber in einer Textbox zusammen ausgegeben werden, nicht einzeln, damit sie auf einmal kopiert werden können.
+
+"short name for relation to child item" soll durch einen maximal 3 Worte langen Text ersetzt werden, der die Beziehung zu dem Kindelement am besten und treffendsten beschreibt.
+
 SELECT * WHERE {
   {
     SELECT
