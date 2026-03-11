@@ -14,8 +14,8 @@ if ($imagesOptional) {
 
 Set-Content -Path $outputFile -Value "" -Encoding UTF8
 
-# --- Definitionen mit optionalen Filtern ---
-# Beispiel: Nur Instanzen von Mensch (Q5) oder chemischen Elementen (Q11344)
+# --- Definitionen ---
+
 $level0 = @{ topic = "wd:Q937"; icVar = "ic_Discoverer" }
 
 $level1Properties = @(
@@ -23,34 +23,48 @@ $level1Properties = @(
         prop = "P61"; 
         shortName = "discovery"; 
         icVar = "ic_Discovery";
-        # BEISPIEL ODER: Instanz von Q3239681 ODER Q214070
+        isReverse = $true; # Rückwärts: ?childItem wdt:P61 ?topic (Wer wurde von Einstein entdeckt?)
+        # BEISPIEL ODER
         filterProp = "P31";
         filterVal  = @("Q3239681", "Q214070") 
     }
 )
 
 $level2Properties = @(
-    @{ prop = "P2579"; shortName = "recognized in"; icVar = "ic_Source" },
-    @{ prop = "P279";  shortName = "superclass of"; icVar = "ic_Superclass"; filterProp = "P31"; filterVal = "Q2001676" },
+    @{ prop = "P2579"; shortName = "recognized in"; icVar = "ic_Source"; isReverse = $true },
+    @{ prop = "P279";  shortName = "superclass of"; icVar = "ic_Superclass"; isReverse = $true; filterProp = "P31"; filterVal = "Q2001676" }
     @{ 
         prop = "P2579"; 
         shortName = "recognized in"; 
         icVar = "ic_Source";
+        isReverse = $true; # Rückwärts: ?childItem wdt:P61 ?topic (Wer wurde von Einstein entdeckt?)
         # BEISPIEL UND: P31=Q3239681 UND P1269=Q11452
         multiFilter = @(
             @{ p = "P31"; v = "Q3239681" },
             @{ p = "P1269"; v = "Q11452" }
         )
-    }    
+    }
 )
 
 $level3Properties = @(
-    @{ prop = "P31";   shortName = "instance of"; icVar = "ic_Type" }, # Kein Filter
-    @{ prop = "P361";  shortName = "part of";      icVar = "ic_Parent" }, # Kein Filter
-    @{ prop = "P1343"; shortName = "described in"; icVar = "ic_Literature" } # Kein Filter
+    @{ prop = "P31";   shortName = "instance of"; icVar = "ic_Type"; isReverse = $false }, # Kein Filter
+    @{ prop = "P361";  shortName = "part of";     icVar = "ic_Parent"; isReverse = $false }, # Kein Filter
+    @{ prop = "P1343"; shortName = "described in"; icVar = "ic_Literature"; isReverse = $false } # Kein Filter
 )
 
-# Hilfsfunktion zur Erzeugung des Filter-Strings in SPARQL
+# --- Hilfsfunktionen ---
+
+# Erzeugt den Triple-String basierend auf der Richtung
+function Get-RelationString($propObj, $subjectVar, $objectVar) {
+    if ($propObj.isReverse) {
+        # B ist Property von A -> ?object wdt:prop ?subject
+        return "?$objectVar wdt:$($propObj.prop) ?$subjectVar ."
+    } else {
+        # A ist Property von B -> ?subject wdt:prop ?object
+        return "?$subjectVar wdt:$($propObj.prop) ?$objectVar ."
+    }
+}
+
 function Get-FilterString($propObj, $targetVar) {
     $sparql = ""
     
@@ -86,7 +100,7 @@ SELECT * WHERE {{
             ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
-      ?childItem wdt:{3} ?topic .
+      {3}
       {7}
       {5} ?topic wdt:P18 ?topicImage . {6}
       {5} ?childItem wdt:P18 ?childItemImage . {6}
@@ -115,8 +129,8 @@ SELECT * WHERE {{
             ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
-      ?childItem wdt:{3} ?topic .
-      ?grandChildItem wdt:{4} ?childItem .
+      {3}
+      {4}
       {8}
       {6} ?childItem wdt:P18 ?childItemImage . {7}
       {6} ?grandChildItem wdt:P18 ?grandChildItemImage . {7}
@@ -145,9 +159,9 @@ SELECT * WHERE {{
             ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
-      ?childItem wdt:{3} ?topic .
-      ?grandChildItem wdt:{4} ?childItem .
-      ?greatGrandChildItem wdt:{5} ?grandChildItem .
+      {3}
+      {4}
+      {5}
       {9}
       {7} ?grandChildItem wdt:P18 ?gcImage . {8}
       {7} ?greatGrandChildItem wdt:P18 ?ggcImage . {8}
@@ -171,8 +185,9 @@ SELECT * WHERE {{
 
 # Level 1
 foreach ($p1 in $level1Properties) {
+    $rel1 = Get-RelationString $p1 "topic" "childItem"
     $fStr = Get-FilterString $p1 "childItem"
-    $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $p1.prop, $p1.shortName, $optPrefix, $optSuffix, $fStr
+    $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $rel1, $p1.shortName, $optPrefix, $optSuffix, $fStr
     Add-Content -Path $outputFile -Value $query -Encoding UTF8
 }
 
@@ -180,10 +195,12 @@ foreach ($p1 in $level1Properties) {
 foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
         if ($p1.icVar -ne $p2.icVar) {
+            $rel1 = Get-RelationString $p1 "topic" "childItem"
+            $rel2 = Get-RelationString $p2 "childItem" "grandChildItem"
             $f1 = Get-FilterString $p1 "childItem"         # Filter für die 1. Ebene
             $f2 = Get-FilterString $p2 "grandChildItem"    # Filter für die 2. Ebene
             $combinedFilters = "$f1 `n      $f2"
-            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $p1.prop, $p2.prop, $p2.shortName, $optPrefix, $optSuffix, $combinedFilters
+            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $rel1, $rel2, $p2.shortName, $optPrefix, $optSuffix, $combinedFilters
             Add-Content -Path $outputFile -Value $query -Encoding UTF8
         }
     }
@@ -194,15 +211,18 @@ foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
         foreach ($p3 in $level3Properties) {
             if ($p2.icVar -ne $p3.icVar) {
+                $rel1 = Get-RelationString $p1 "topic" "childItem"
+                $rel2 = Get-RelationString $p2 "childItem" "grandChildItem"
+                $rel3 = Get-RelationString $p3 "grandChildItem" "greatGrandChildItem"
                 $f1 = Get-FilterString $p1 "childItem"
                 $f2 = Get-FilterString $p2 "grandChildItem"
                 $f3 = Get-FilterString $p3 "greatGrandChildItem"
                 $combinedFilters = "$f1 `n      $f2 `n      $f3"
-                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $p1.prop, $p2.prop, $p3.prop, $p3.shortName, $optPrefix, $optSuffix, $combinedFilters
+                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $rel1, $rel2, $rel3, $p3.shortName, $optPrefix, $optSuffix, $combinedFilters
                 Add-Content -Path $outputFile -Value $query -Encoding UTF8
             }
         }
     }
 }
 
-Write-Host "Queries mit optionalen Filtern generiert." -ForegroundColor Green
+Write-Host "Queries mit Richtungsoption (Vorwärts/Rückwärts) generiert." -ForegroundColor Green
