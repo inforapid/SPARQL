@@ -3,13 +3,21 @@
 $outputFile = "queries.sparql"
 # STEUERUNG: $true = Bilder sind optional, $false = Bilder sind Pflicht (Query liefert nur Ergebnisse mit Bildern)
 $imagesOptional = $true 
+# STEUERUNG URLS: $true = Wikipedia Links werden geliefert
+$includeUrls = $true
 
 if ($imagesOptional) {
-    $optPrefix = "OPTIONAL { "
-    $optSuffix = " }"
+    $optPrefix = "OPTIONAL {"
+    $optSuffix = "}"
 } else {
     $optPrefix = ""
     $optSuffix = ""
+}
+
+# Funktion für die URL-Statements (nutzt die direkten Variablen vor dem BIND)
+function Get-UrlStatements($sVar, $eVar) {
+    if (-not $includeUrls) { return "" }
+    return "OPTIONAL { ?iu_startUrl schema:about ?$sVar; schema:isPartOf <https://en.wikipedia.org/>. } `n      OPTIONAL { ?iu_endUrl schema:about ?$eVar; schema:isPartOf <https://en.wikipedia.org/>. }"
 }
 
 Set-Content -Path $outputFile -Value "" -Encoding UTF8
@@ -106,6 +114,7 @@ SELECT * WHERE {{
       {5} ?childItem wdt:P18 ?childItemImage . {6}
       BIND(?topic AS ?i_start)
       BIND(?childItem AS ?i_end)
+      {8}
       BIND(?topicImage AS ?ii_startImage)
       BIND(?childItemImage AS ?ii_endImage)
       BIND("{4}" AS ?rn_Name)
@@ -136,6 +145,7 @@ SELECT * WHERE {{
       {6} ?grandChildItem wdt:P18 ?grandChildItemImage . {7}
       BIND(?childItem AS ?i_start)
       BIND(?grandChildItem AS ?i_end)
+      {9}
       BIND(?childItemImage AS ?ii_startImage)
       BIND(?grandChildItemImage AS ?ii_endImage)
       BIND("{5}" AS ?rn_Name)
@@ -165,6 +175,7 @@ SELECT * WHERE {{
       {9}
       {7} ?grandChildItem wdt:P18 ?gcImage . {8}
       {7} ?greatGrandChildItem wdt:P18 ?ggcImage . {8}
+      {10}
       BIND(?grandChildItem AS ?i_start)
       BIND(?greatGrandChildItem AS ?i_end)
       BIND(?gcImage AS ?ii_startImage)
@@ -187,7 +198,8 @@ SELECT * WHERE {{
 foreach ($p1 in $level1Properties) {
     $rel1 = Get-RelationString $p1 "topic" "childItem"
     $fStr = Get-FilterString $p1 "childItem"
-    $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $rel1, $p1.shortName, $optPrefix, $optSuffix, $fStr
+    $urls = Get-UrlStatements "topic" "childItem"
+    $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $rel1, $p1.shortName, $optPrefix, $optSuffix, $fStr, $urls
     Add-Content -Path $outputFile -Value $query -Encoding UTF8
 }
 
@@ -200,7 +212,8 @@ foreach ($p1 in $level1Properties) {
             $f1 = Get-FilterString $p1 "childItem"         # Filter für die 1. Ebene
             $f2 = Get-FilterString $p2 "grandChildItem"    # Filter für die 2. Ebene
             $combinedFilters = "$f1 `n      $f2"
-            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $rel1, $rel2, $p2.shortName, $optPrefix, $optSuffix, $combinedFilters
+            $urls = Get-UrlStatements "childItem" "grandChildItem"
+            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $rel1, $rel2, $p2.shortName, $optPrefix, $optSuffix, $combinedFilters, $urls
             Add-Content -Path $outputFile -Value $query -Encoding UTF8
         }
     }
@@ -218,11 +231,12 @@ foreach ($p1 in $level1Properties) {
                 $f2 = Get-FilterString $p2 "grandChildItem"
                 $f3 = Get-FilterString $p3 "greatGrandChildItem"
                 $combinedFilters = "$f1 `n      $f2 `n      $f3"
-                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $rel1, $rel2, $rel3, $p3.shortName, $optPrefix, $optSuffix, $combinedFilters
+                $urls = Get-UrlStatements "grandChildItem" "greatGrandChildItem"
+                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $rel1, $rel2, $rel3, $p3.shortName, $optPrefix, $optSuffix, $combinedFilters, $urls
                 Add-Content -Path $outputFile -Value $query -Encoding UTF8
             }
         }
     }
 }
 
-Write-Host "Queries mit Richtungsoption (Vorwärts/Rückwärts) generiert." -ForegroundColor Green
+Write-Host "Queries erfolgreich generiert." -ForegroundColor Green
