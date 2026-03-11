@@ -1,10 +1,13 @@
 # PowerShell Skript: Erzeugt queries.sparql (Level 1 bis Level 3) mit optionalen Filtern
 
 $outputFile = "queries.sparql"
-# STEUERUNG: $true = Bilder sind optional, $false = Bilder sind Pflicht (Query liefert nur Ergebnisse mit Bildern)
+# STEUERUNG: $true = Bilder sind optional, $false = Bilder sind Pflicht
 $imagesOptional = $true 
 # STEUERUNG URLS: $true = Wikipedia Links werden geliefert
 $includeUrls = $true
+# GLOBALE SPRACHE: lang = Fallback-Kette für Labels; wikiLang = Wikipedia-Sprachversion
+$lang = "de,en"
+$wikiLang = "de"
 
 if ($imagesOptional) {
     $optPrefix = "OPTIONAL {"
@@ -14,12 +17,13 @@ if ($imagesOptional) {
     $optSuffix = ""
 }
 
-# Funktion für die URL-Statements (nutzt die direkten Variablen vor dem BIND)
+# Funktion für die URL-Statements (nutzt globale $wikiLang)
 function Get-UrlStatements($sVar, $eVar) {
     if (-not $includeUrls) { return "" }
-    return "OPTIONAL { ?iu_startUrl schema:about ?$sVar; schema:isPartOf <https://en.wikipedia.org/>. } `n      OPTIONAL { ?iu_endUrl schema:about ?$eVar; schema:isPartOf <https://en.wikipedia.org/>. }"
+    return "OPTIONAL { ?iu_startUrl schema:about ?$sVar; schema:isPartOf <https://$wikiLang.wikipedia.org/>. } `n      OPTIONAL { ?iu_endUrl schema:about ?$eVar; schema:isPartOf <https://$wikiLang.wikipedia.org/>. }"
 }
 
+# Initialisierung
 Set-Content -Path $outputFile -Value "" -Encoding UTF8
 
 # --- Definitionen ---
@@ -40,7 +44,7 @@ $level1Properties = @(
 
 $level2Properties = @(
     @{ prop = "P2579"; shortName = "recognized in"; icVar = "ic_Source"; isReverse = $true },
-    @{ prop = "P279";  shortName = "superclass of"; icVar = "ic_Superclass"; isReverse = $true; filterProp = "P31"; filterVal = "Q2001676" }
+    @{ prop = "P279";  shortName = "superclass of"; icVar = "ic_Superclass"; isReverse = $true; filterProp = "P31"; filterVal = "Q2001676" },
     @{ 
         prop = "P2579"; 
         shortName = "recognized in"; 
@@ -97,7 +101,7 @@ function Get-FilterString($propObj, $targetVar) {
     return $sparql
 }
 
-# --- Templates ---
+# --- Templates (nutzen globale Variable $lang direkt) ---
 
 $level1Template = @"
 #query Level 1
@@ -118,7 +122,7 @@ SELECT * WHERE {{
       BIND(?topicImage AS ?ii_startImage)
       BIND(?childItemImage AS ?ii_endImage)
       BIND("{4}" AS ?rn_Name)
-      SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+      SERVICE wikibase:label {{ bd:serviceParam wikibase:language "$lang". }}
     }}
     ORDER BY ASC(xsd:integer(REPLACE(STR(?i_end), "^.*Q", "")))
   }}
@@ -149,7 +153,7 @@ SELECT * WHERE {{
       BIND(?childItemImage AS ?ii_startImage)
       BIND(?grandChildItemImage AS ?ii_endImage)
       BIND("{5}" AS ?rn_Name)
-      SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+      SERVICE wikibase:label {{ bd:serviceParam wikibase:language "$lang". }}
     }}
     ORDER BY ASC(xsd:integer(REPLACE(STR(?i_end), "^.*Q", "")))
   }}
@@ -181,7 +185,7 @@ SELECT * WHERE {{
       BIND(?gcImage AS ?ii_startImage)
       BIND(?ggcImage AS ?ii_endImage)
       BIND("{6}" AS ?rn_Name)
-      SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+      SERVICE wikibase:label {{ bd:serviceParam wikibase:language "$lang". }}
     }}
     ORDER BY ASC(xsd:integer(REPLACE(STR(?i_end), "^.*Q", "")))
   }}
