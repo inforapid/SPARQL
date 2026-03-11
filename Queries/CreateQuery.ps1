@@ -107,7 +107,7 @@ SELECT * WHERE {{
 "@
 
 $level2Template = @"
-#query
+#query Level 2
 SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl
@@ -180,8 +180,10 @@ foreach ($p1 in $level1Properties) {
 foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
         if ($p1.icVar -ne $p2.icVar) {
-            $fStr = Get-FilterString $p2 "grandChildItem"
-            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $p1.prop, $p2.prop, $p2.shortName, $optPrefix, $optSuffix, $fStr
+            $f1 = Get-FilterString $p1 "childItem"         # Filter für die 1. Ebene
+            $f2 = Get-FilterString $p2 "grandChildItem"    # Filter für die 2. Ebene
+            $combinedFilters = "$f1 `n      $f2"
+            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $p1.prop, $p2.prop, $p2.shortName, $optPrefix, $optSuffix, $combinedFilters
             Add-Content -Path $outputFile -Value $query -Encoding UTF8
         }
     }
@@ -192,8 +194,11 @@ foreach ($p1 in $level1Properties) {
     foreach ($p2 in $level2Properties) {
         foreach ($p3 in $level3Properties) {
             if ($p2.icVar -ne $p3.icVar) {
-                $fStr = Get-FilterString $p3 "greatGrandChildItem"
-                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $p1.prop, $p2.prop, $p3.prop, $p3.shortName, $optPrefix, $optSuffix, $fStr
+                $f1 = Get-FilterString $p1 "childItem"
+                $f2 = Get-FilterString $p2 "grandChildItem"
+                $f3 = Get-FilterString $p3 "greatGrandChildItem"
+                $combinedFilters = "$f1 `n      $f2 `n      $f3"
+                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $p1.prop, $p2.prop, $p3.prop, $p3.shortName, $optPrefix, $optSuffix, $combinedFilters
                 Add-Content -Path $outputFile -Value $query -Encoding UTF8
             }
         }
