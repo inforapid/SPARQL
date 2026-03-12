@@ -1,6 +1,6 @@
 $level0 = @{ 
     topic = "wd:Q8676"; 
-    icVar = "ic_CivilWar";
+    icVar = "ic__Campaign";
     extraProps = @(
         @{ prop = "P580"; icVar = "ic_StartTime" },
         @{ prop = "P582"; icVar = "ic_EndTime" }
@@ -50,10 +50,32 @@ $level2Properties = @(
         )
     },
     @{ 
-        prop = "P607"; 
-        shortName = "party"; 
-        icVar = "ic_Party";
+        prop = "P361"; 
+        shortName = "part"; 
+        icVar = "ic__Campaign";
         isReverse = $true;
+        extraProps = @(
+            @{ prop = "P580"; icVar = "ic_StartTime" },
+            @{ prop = "P582"; icVar = "ic_EndTime" },
+            @{ prop = "P585"; icVar = "ic_Time" },
+            @{ prop = "P276"; icVar = "ic_LocationLabel" }
+        )
+    },
+    @{ 
+        prop = "P607"; 
+        shortName = "participant"; 
+        icVar = "ic_Participant";
+        isReverse = $true;
+        extraProps = @(
+            @{ prop = "P569"; icVar = "ic_DateOfBirth" },
+            @{ prop = "P570"; icVar = "ic_DateOfDeath" }
+        )
+    },
+    @{ 
+        prop = "P710"; 
+        shortName = "participant"; 
+        icVar = "ic_Participant";
+        isReverse = $false;
         extraProps = @(
             @{ prop = "P569"; icVar = "ic_DateOfBirth" },
             @{ prop = "P570"; icVar = "ic_DateOfDeath" }
