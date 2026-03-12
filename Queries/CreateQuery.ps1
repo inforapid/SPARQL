@@ -129,14 +129,14 @@ SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl{9}
             ?rn_Name (?rn_Name AS ?rc_Category)
-            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl{10}
+            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
       {3}
       {7}
       {5} ?topic wdt:P18 ?topicImage . {6}
       {5} ?childItem wdt:P18 ?childItemImage . {6}
-      {11}{12}
+      {10}
       BIND(?topic AS ?i_start)
       BIND(?childItem AS ?i_end)
       {8}
@@ -160,7 +160,7 @@ SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl{10}
             ?rn_Name (?rn_Name AS ?rc_Category)
-            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl{11}
+            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
       {3}
@@ -168,7 +168,7 @@ SELECT * WHERE {{
       {8}
       {6} ?childItem wdt:P18 ?childItemImage . {7}
       {6} ?grandChildItem wdt:P18 ?grandChildItemImage . {7}
-      {12}{13}
+      {11}
       BIND(?childItem AS ?i_start)
       BIND(?grandChildItem AS ?i_end)
       {9}
@@ -192,7 +192,7 @@ SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl{11}
             ?rn_Name (?rn_Name AS ?rc_Category)
-            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl{12}
+            ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
       BIND({2} AS ?topic)
       {3}
@@ -201,7 +201,7 @@ SELECT * WHERE {{
       {9}
       {7} ?grandChildItem wdt:P18 ?gcImage . {8}
       {7} ?greatGrandChildItem wdt:P18 ?ggcImage . {8}
-      {13}{14}
+      {12}
       BIND(?grandChildItem AS ?i_start)
       BIND(?greatGrandChildItem AS ?i_end)
       {10}
@@ -228,8 +228,7 @@ foreach ($p1 in $level1Properties) {
     $urls = Get-UrlStatements "topic" "childItem"
     $cnt = [ref]1
     $exS = Get-ExtraProps "topic" $level0.extraProps $cnt
-    $exE = Get-ExtraProps "childItem" $p1.extraProps $cnt
-    $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $rel1, $p1.shortName, $optPrefix, $optSuffix, $fStr, $urls, $exS.select, $exE.select, $exS.where, $exE.where
+    $query = $level1Template -f $level0.icVar, $p1.icVar, $level0.topic, $rel1, $p1.shortName, $optPrefix, $optSuffix, $fStr, $urls, $exS.select, $exS.where
     Add-Content -Path $outputFile -Value $query -Encoding UTF8
 }
 
@@ -245,8 +244,7 @@ foreach ($p1 in $level1Properties) {
             $urls = Get-UrlStatements "childItem" "grandChildItem"
             $cnt = [ref]1
             $exS = Get-ExtraProps "childItem" $p1.extraProps $cnt
-            $exE = Get-ExtraProps "grandChildItem" $p2.extraProps $cnt
-            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $rel1, $rel2, $p2.shortName, $optPrefix, $optSuffix, $combinedFilters, $urls, $exS.select, $exE.select, $exS.where, $exE.where
+            $query = $level2Template -f $p1.icVar, $p2.icVar, $level0.topic, $rel1, $rel2, $p2.shortName, $optPrefix, $optSuffix, $combinedFilters, $urls, $exS.select, $exS.where
             Add-Content -Path $outputFile -Value $query -Encoding UTF8
         }
     }
@@ -267,8 +265,7 @@ foreach ($p1 in $level1Properties) {
                 $urls = Get-UrlStatements "grandChildItem" "greatGrandChildItem"
                 $cnt = [ref]1
                 $exS = Get-ExtraProps "grandChildItem" $p2.extraProps $cnt
-                $exE = Get-ExtraProps "greatGrandChildItem" $p3.extraProps $cnt
-                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $rel1, $rel2, $rel3, $p3.shortName, $optPrefix, $optSuffix, $combinedFilters, $urls, $exS.select, $exE.select, $exS.where, $exE.where
+                $query = $level3Template -f $p2.icVar, $p3.icVar, $level0.topic, $rel1, $rel2, $rel3, $p3.shortName, $optPrefix, $optSuffix, $combinedFilters, $urls, $exS.select, $exS.where
                 Add-Content -Path $outputFile -Value $query -Encoding UTF8
             }
         }

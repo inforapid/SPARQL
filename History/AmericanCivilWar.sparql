@@ -1,20 +1,55 @@
-$level0 = @{ topic = "wd:Q8676"; icVar = "ic_CivilWar" }
+$level0 = @{ 
+    topic = "wd:Q8676"; 
+    icVar = "ic_CivilWar";
+    extraProps = @(
+        @{ prop = "P580"; icVar = "ic_StartTime" },
+        @{ prop = "P582"; icVar = "ic_EndTime" }
+    );
+}
 
 $level1Properties = @(
     @{ 
         prop = "P361"; 
         shortName = "campaign"; 
         icVar = "ic_Campaign";
+        isReverse = $true; # Rückwärts: ?childItem wdt:P61 ?topic (Wer wurde von Einstein entdeckt?)
         # BEISPIEL ODER: Instanz von Q3239681 ODER Q214070
         filterProp = "P31";
-        filterVal  = @("Q2001676", "Q831663") 
+        filterVal  = @("Q2001676", "Q831663");
+        extraProps = @(
+            @{ prop = "P580"; icVar = "ic_StartTime" },
+            @{ prop = "P582"; icVar = "ic_EndTime" }
+        );
     }
 )
 
 $level2Properties = @(
-    @{ prop = "P156"; shortName = "previous"; icVar = "ic__Campaign" }
-    @{ prop = "P155"; shortName = "next"; icVar = "ic__Campaign" },
-    @{ prop = "P607"; shortName = "party"; icVar = "ic_Party" }
+    @{ 
+        prop = "P156"; 
+        shortName = "next"; 
+        icVar = "ic__Campaign";
+        isReverse = $false; # Rückwärts: ?childItem wdt:P61 ?topic (Wer wurde von Einstein entdeckt?)
+        extraProps = @(
+            @{ prop = "P580"; icVar = "ic_StartTime" },
+            @{ prop = "P582"; icVar = "ic_EndTime" }
+        )
+    },
+    @{ 
+        prop = "P155"; 
+        shortName = "previous"; 
+        icVar = "ic__Campaign";
+        isReverse = $false; # Rückwärts: ?childItem wdt:P61 ?topic (Wer wurde von Einstein entdeckt?)
+        extraProps = @(
+            @{ prop = "P580"; icVar = "ic_StartTime" },
+            @{ prop = "P582"; icVar = "ic_EndTime" }
+        )
+    },
+    @{ 
+        prop = "P607"; 
+        shortName = "party"; 
+        icVar = "ic_Party";
+        isReverse = $true; # Rückwärts: ?childItem wdt:P61 ?topic (Wer wurde von Einstein entdeckt?)
+    }
 )
 
 $level3Properties = @(
