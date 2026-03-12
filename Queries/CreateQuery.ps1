@@ -29,8 +29,11 @@ function Get-ExtraProps($itemVar, $extraProps, [ref]$counter) {
     if ($extraProps) {
         foreach ($ep in $extraProps) {
             $num = $counter.Value++
-            $res.select += " ?rn_t_property${num}Label (?rn_t_property${num}Label as ?rc_property${num}Label) ?$($ep.icVar)"
-            $res.where += "`n      OPTIONAL { ?$itemVar wdt:$($ep.prop) ?$($ep.icVar). ?rn_t_property$num wikibase:directClaim wdt:$($ep.prop). }"
+            $icVar = $ep.icVar
+            # Entferne Label oder Description am Ende für den where-Teil
+            $whereVar = $icVar -replace '(Label|Description)$',''
+            $res.select += " ?rn_t_property${num}Label (?rn_t_property${num}Label as ?rc_property${num}Label) ?$icVar"
+            $res.where += "`n      OPTIONAL { ?$itemVar wdt:$($ep.prop) ?$whereVar. ?rn_t_property$num wikibase:directClaim wdt:$($ep.prop). }"
         }
     }
     return $res
