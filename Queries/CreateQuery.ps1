@@ -142,7 +142,7 @@ SELECT * WHERE {{
             ?rn_Name (?rn_Name AS ?rc_Category)
             ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
-      BIND({2} AS ?topic)
+      VALUES ?topic {{ {2} }}
       {3}
       {7}
       {5} ?topic wdt:P18 ?topicImage . {6}
@@ -172,7 +172,7 @@ SELECT * WHERE {{
             ?rn_Name (?rn_Name AS ?rc_Category)
             ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
-      BIND({2} AS ?topic)
+      VALUES ?topic {{ {2} }}
       {3}
       {4}
       {8}
@@ -203,7 +203,7 @@ SELECT * WHERE {{
             ?rn_Name (?rn_Name AS ?rc_Category)
             ?i_end ?i_endLabel ?i_endDescription ?{1} ?ii_endImage ?iu_endUrl
     WHERE {{
-      BIND({2} AS ?topic)
+      VALUES ?topic {{ {2} }}
       {3}
       {4}
       {5}
@@ -233,7 +233,7 @@ SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl{5}
     WHERE {{
-      BIND({1} AS ?topic)
+      VALUES ?topic {{ {1} }}
       {2} ?topic wdt:P18 ?topicImage . {3}
       {6}
       BIND(?topic AS ?i_start)
@@ -253,7 +253,7 @@ SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl{7}
     WHERE {{
-      BIND({1} AS ?topic)
+      VALUES ?topic {{ {1} }}
       {2}
       {5}
       {3} ?childItem wdt:P18 ?childItemImage . {4}
@@ -275,7 +275,7 @@ SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl{8}
     WHERE {{
-      BIND({1} AS ?topic)
+      VALUES ?topic {{ {1} }}
       {2}
       {3}
       {6}
@@ -298,7 +298,7 @@ SELECT * WHERE {{
   {{
     SELECT ?i_start ?i_startLabel ?i_startDescription ?{0} ?ii_startImage ?iu_startUrl{9}
     WHERE {{
-      BIND({1} AS ?topic)
+      VALUES ?topic {{ {1} }}
       {2}
       {3}
       {4}
