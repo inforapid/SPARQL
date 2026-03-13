@@ -6,7 +6,7 @@ $imagesOptional = $true
 # STEUERUNG URLS: $true = Wikipedia Links werden geliefert
 $includeUrls = $true
 # GLOBALE SPRACHE: lang = Fallback-Kette für Labels; wikiLang = Wikipedia-Sprachversion
-$lang = "de,en"
+$lang = "de,mul" # bei mul sucht er nach label in einer beliebigen Sprache
 $wikiLang = "de"
 
 if ($imagesOptional) {

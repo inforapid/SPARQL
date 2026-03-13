@@ -1,0 +1,42 @@
+$level0 = @{ 
+    topic = "wd:Q193692"; 
+    icVar = "ic_Topic";
+}
+
+$level1Properties = @(
+    @{ 
+        prop = "P279"; 
+        icVar = "ic_Car";
+        isReverse = $true;
+        extraProps = @(
+            @{ prop = "P571"; icVar = "ic_Inception" },
+            @{ prop = "P1071"; icVar = "ic_Location" },
+            @{ prop = "P2664"; icVar = "ic_UnitsSold" },
+            @{ prop = "P2067"; icVar = "ic_Mass" }
+        );
+    }
+)
+
+$level2Properties = @(
+    @{ 
+        prop = "P176"; 
+        icVar = "ic_Manufacturer";
+        isReverse = $false;
+    }
+)
+
+$level3Properties = @(
+    @{ 
+        prop = "P452"; 
+        icVar = "ic_Industry";
+        isReverse = $false;
+        filterProp = "P1056";
+        filterVal  = @("Q1420");
+    },
+    @{ 
+        prop = "P17"; 
+        icVar = "ic_Country";
+        shortName = "country"; 
+        isReverse = $false;
+    }
+)
